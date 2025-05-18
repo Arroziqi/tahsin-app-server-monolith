@@ -1,16 +1,18 @@
 import { PrismaClient } from '@prisma/client';
+import { hashPassword } from '../src/common/provider/hash';
 
 const prisma = new PrismaClient();
 
 async function main() {
   const now = new Date();
+  const password = await hashPassword('password123');
 
   // Users
   const superAdmin = await prisma.user.create({
     data: {
       username: 'superadmin',
       email: 'superadmin@example.com',
-      password: 'password123',
+      password: password,
       createdAt: now,
       updatedAt: now,
       updatedBy: 1,
@@ -21,7 +23,7 @@ async function main() {
     data: {
       username: 'admin1',
       email: 'admin@example.com',
-      password: 'password123',
+      password: password,
       createdAt: now,
       updatedAt: now,
       updatedBy: superAdmin.id,
@@ -32,7 +34,7 @@ async function main() {
     data: {
       username: 'teacher1',
       email: 'teacher@example.com',
-      password: 'password123',
+      password: password,
       createdAt: now,
       updatedAt: now,
       updatedBy: superAdmin.id,
@@ -43,7 +45,7 @@ async function main() {
     data: {
       username: 'student1',
       email: 'student@example.com',
-      password: 'password123',
+      password: password,
       createdAt: now,
       updatedAt: now,
       updatedBy: superAdmin.id,
@@ -51,15 +53,25 @@ async function main() {
   });
 
   // Admin
-  await prisma.admin.create({
-    data: {
-      noAdmin: 1001,
-      name: 'Admin Utama',
-      userId: adminUser.id,
-      createdAt: now,
-      updatedAt: now,
-      updatedBy: superAdmin.id,
-    },
+  await prisma.admin.createMany({
+    data: [
+      {
+        noAdmin: 1001,
+        name: 'Admin Utama',
+        userId: adminUser.id,
+        createdAt: now,
+        updatedAt: now,
+        updatedBy: superAdmin.id,
+      },
+      {
+        noAdmin: 1002,
+        name: 'Super Admin',
+        userId: superAdmin.id,
+        createdAt: now,
+        updatedAt: now,
+        updatedBy: superAdmin.id,
+      },
+    ],
   });
 
   // Teacher
