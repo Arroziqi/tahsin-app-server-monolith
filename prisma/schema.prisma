@@ -1,0 +1,380 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  username  String    @unique
+  email     String    @unique
+  password  String
+  token     String?   @unique
+  createdAt DateTime? @default(now()) @map("created_at")
+  createdBy Int?      @map("created_by")
+  updatedAt DateTime? @default(now()) @map("updated_at")
+  updatedBy Int?      @map("updated_by")
+
+  Admin      Admin?
+  Teacher    Teacher?
+  Student    Student?
+  Enrollment Enrollment[]
+
+  @@map("user")
+}
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  noAdmin   Int      @unique @map("no_admin")
+  name      String
+  userId    Int      @unique @map("user_id")
+  createdAt DateTime @map("created_at")
+  createdBy Int?     @map("created_by")
+  updatedAt DateTime @map("updated_at")
+  updatedBy Int      @map("updated_by")
+
+  User User @relation(fields: [userId], references: [id])
+
+  @@map("admin")
+}
+
+model Student {
+  id              Int      @id @default(autoincrement())
+  fullName        String   @map("full_name")
+  motivation      String
+  userId          Int      @unique @map("user_id")
+  levelId         Int?     @map("level_id")
+  classId         Int      @map("class_id")
+  enrollmentId    Int      @map("enrollment_id")
+  studentStatusId Int?     @map("student_status_id")
+  createdAt       DateTime @map("created_at")
+  createdBy       Int?     @map("created_by")
+  updatedAt       DateTime @map("updated_at")
+  updatedBy       Int      @map("updated_by")
+
+  User          User           @relation(fields: [userId], references: [id])
+  Level         Level?         @relation(fields: [levelId], references: [id])
+  Class         Class          @relation(fields: [classId], references: [id])
+  Enrollment    Enrollment     @relation(fields: [enrollmentId], references: [id])
+  StudentStatus StudentStatus? @relation(fields: [studentStatusId], references: [id])
+  Scores        Score[]
+  Attendances   Attendance[]
+  Bills         Bill[]
+  Transactions  Transaction[]
+
+  @@map("student")
+}
+
+model Teacher {
+  id            Int      @id @default(autoincrement())
+  name          String
+  nip           Int
+  accountNumber Int?     @map("account_number")
+  accountName   String?  @map("account_name")
+  bankName      String?  @map("bank_name")
+  userId        Int      @unique @map("user_id")
+  createdAt     DateTime @map("created_at")
+  createdBy     Int?     @map("created_by")
+  updatedAt     DateTime @map("updated_at")
+  updatedBy     Int      @map("updated_by")
+
+  User      User       @relation(fields: [userId], references: [id])
+  Schedules Schedule[]
+  Tasks     Task[]
+
+  @@map("teacher")
+}
+
+model Level {
+  id        Int      @id @default(autoincrement())
+  level     String   @unique
+  createdAt DateTime @map("created_at")
+  createdBy Int?     @map("created_by")
+  updatedAt DateTime @map("updated_at")
+  updatedBy Int      @map("updated_by")
+
+  Students Student[]
+
+  @@map("level")
+}
+
+model Time {
+  id        Int      @id @default(autoincrement())
+  time      Int
+  createdAt DateTime @map("created_at")
+  createdBy Int?     @map("created_by")
+  updatedAt DateTime @map("updated_at")
+  updatedBy Int      @map("updated_by")
+
+  Schedules Schedule[]
+
+  @@map("time")
+}
+
+model Day {
+  id        Int      @id @default(autoincrement())
+  day       String
+  createdAt DateTime @map("created_at")
+  createdBy Int?     @map("created_by")
+  updatedAt DateTime @map("updated_at")
+  updatedBy Int      @map("updated_by")
+
+  Schedules Schedule[]
+
+  @@map("day")
+}
+
+model BankAccount {
+  id            Int      @id @default(autoincrement())
+  accountName   String   @map("account_name")
+  accountNumber String   @map("account_number")
+  bankName      String   @map("bank_name")
+  createdAt     DateTime @map("created_at")
+  createdBy     Int?     @map("created_by")
+  updatedAt     DateTime @map("updated_at")
+  updatedBy     Int      @map("updated_by")
+
+  Transactions Transaction[]
+
+  @@map("bank_account")
+}
+
+model TransactionType {
+  id        Int      @id @default(autoincrement())
+  type      String   @unique
+  createdAt DateTime @map("created_at")
+  createdBy Int?     @map("created_by")
+  updatedAt DateTime @map("updated_at")
+  updatedBy Int      @map("updated_by")
+
+  Transactions Transaction[]
+
+  @@map("transaction_type")
+}
+
+model StudentStatus {
+  id        Int      @id @default(autoincrement())
+  status    String   @unique
+  createdAt DateTime @map("created_at")
+  createdBy Int?     @map("created_by")
+  updatedAt DateTime @map("updated_at")
+  updatedBy Int      @map("updated_by")
+
+  Students Student[]
+
+  @@map("student_status")
+}
+
+model TransactionStatus {
+  id        Int      @id @default(autoincrement())
+  status    String   @unique
+  createdAt DateTime @map("created_at")
+  createdBy Int?     @map("created_by")
+  updatedAt DateTime @map("updated_at")
+  updatedBy Int      @map("updated_by")
+
+  Transactions Transaction[]
+
+  @@map("transaction_status")
+}
+
+model ClassPrice {
+  id        Int      @id @default(autoincrement())
+  price     Int
+  createdAt DateTime @map("created_at")
+  createdBy Int?     @map("created_by")
+  updatedAt DateTime @map("updated_at")
+  updatedBy Int      @map("updated_by")
+
+  Classes Class[]
+
+  @@map("class_price")
+}
+
+model Batch {
+  id        Int      @id @default(autoincrement())
+  batch     String
+  year      Int
+  createdAt DateTime @map("created_at")
+  createdBy Int?     @map("created_by")
+  updatedAt DateTime @map("updated_at")
+  updatedBy Int      @map("updated_by")
+
+  Classes Class[]
+
+  @@map("batch")
+}
+
+model Class {
+  id           Int      @id @default(autoincrement())
+  class        String
+  classPriceId Int      @map("class_price_id")
+  batchId      Int?     @map("batch_id")
+  createdAt    DateTime @map("created_at")
+  createdBy    Int?     @map("created_by")
+  updatedAt    DateTime @map("updated_at")
+  updatedBy    Int      @map("updated_by")
+
+  ClassPrice  ClassPrice   @relation(fields: [classPriceId], references: [id])
+  Batch       Batch?       @relation(fields: [batchId], references: [id])
+  Students    Student[]
+  Modules     Module[]
+  Schedules   Schedule[]
+  Enrollments Enrollment[]
+
+  @@map("class")
+}
+
+model Schedule {
+  id        Int      @id @default(autoincrement())
+  classId   Int      @map("class_id")
+  teacherId Int?     @map("teacher_id")
+  dayId     Int?     @map("day_id")
+  timeId    Int?     @map("time_id")
+  createdAt DateTime @map("created_at")
+  createdBy Int?     @map("created_by")
+  updatedAt DateTime @map("updated_at")
+  updatedBy Int      @map("updated_by")
+
+  Class       Class        @relation(fields: [classId], references: [id])
+  Teacher     Teacher?     @relation(fields: [teacherId], references: [id])
+  Day         Day?         @relation(fields: [dayId], references: [id])
+  Time        Time?        @relation(fields: [timeId], references: [id])
+  Attendances Attendance[]
+
+  @@map("schedule")
+}
+
+model Module {
+  id        Int      @id @default(autoincrement())
+  classId   Int      @map("class_id")
+  module    String
+  createdAt DateTime @map("created_at")
+  createdBy Int?     @map("created_by")
+  updatedAt DateTime @map("updated_at")
+  updatedBy Int      @map("updated_by")
+
+  Class      Class       @relation(fields: [classId], references: [id])
+  Components Component[]
+  Tasks      Task[]
+
+  @@map("module")
+}
+
+model Component {
+  id        Int      @id @default(autoincrement())
+  moduleId  Int      @map("module_id")
+  component String
+  createdAt DateTime @map("created_at")
+  createdBy Int?     @map("created_by")
+  updatedAt DateTime @map("updated_at")
+  updatedBy Int      @map("updated_by")
+
+  Module Module @relation(fields: [moduleId], references: [id])
+
+  @@map("component")
+}
+
+model Task {
+  id        Int      @id @default(autoincrement())
+  moduleId  Int      @map("module_id")
+  teacherId Int?     @map("teacher_id")
+  task      String?
+  createdAt DateTime @map("created_at")
+  createdBy Int?     @map("created_by")
+  updatedAt DateTime @map("updated_at")
+  updatedBy Int      @map("updated_by")
+
+  Module  Module   @relation(fields: [moduleId], references: [id])
+  Teacher Teacher? @relation(fields: [teacherId], references: [id])
+  Scores  Score[]
+
+  @@map("task")
+}
+
+model Score {
+  id        Int      @id @default(autoincrement())
+  studentId Int      @map("student_id")
+  taskId    Int      @map("task_id")
+  createdAt DateTime @map("created_at")
+  createdBy Int?     @map("created_by")
+  updatedAt DateTime @map("updated_at")
+  updatedBy Int      @map("updated_by")
+
+  Student Student @relation(fields: [studentId], references: [id])
+  Task    Task    @relation(fields: [taskId], references: [id])
+
+  @@map("score")
+}
+
+model Attendance {
+  id         Int      @id @default(autoincrement())
+  studentId  Int      @map("student_id")
+  scheduleId Int      @map("schedule_id")
+  createdAt  DateTime @map("created_at")
+  createdBy  Int?     @map("created_by")
+  updatedAt  DateTime @map("updated_at")
+  updatedBy  Int      @map("updated_by")
+
+  Student  Student  @relation(fields: [studentId], references: [id])
+  Schedule Schedule @relation(fields: [scheduleId], references: [id])
+
+  @@map("attendance")
+}
+
+model Bill {
+  id          Int      @id @default(autoincrement())
+  studentId   Int      @map("student_id")
+  bill        Int?
+  remainBill  Int?     @map("remain_bill")
+  description String?
+  createdAt   DateTime @map("created_at")
+  createdBy   Int?     @map("created_by")
+  updatedAt   DateTime @map("updated_at")
+  updatedBy   Int      @map("updated_by")
+
+  Student      Student       @relation(fields: [studentId], references: [id])
+  Transactions Transaction[]
+
+  @@map("bill")
+}
+
+model Transaction {
+  id                  Int      @id @default(autoincrement())
+  bankAccountId       Int      @map("bank_account_id")
+  billId              Int?     @map("bill_id")
+  studentId           Int      @map("student_id")
+  transactionTypeId   Int?     @map("transaction_type_id")
+  transactionStatusId Int?     @map("transaction_status_id")
+  createdAt           DateTime @map("created_at")
+  createdBy           Int?     @map("created_by")
+  updatedAt           DateTime @map("updated_at")
+  updatedBy           Int      @map("updated_by")
+
+  BankAccount       BankAccount        @relation(fields: [bankAccountId], references: [id])
+  Bill              Bill?              @relation(fields: [billId], references: [id])
+  Student           Student            @relation(fields: [studentId], references: [id])
+  TransactionType   TransactionType?   @relation(fields: [transactionTypeId], references: [id])
+  TransactionStatus TransactionStatus? @relation(fields: [transactionStatusId], references: [id])
+
+  @@map("transaction")
+}
+
+model Enrollment {
+  id        Int      @id @default(autoincrement())
+  userId    Int?     @map("user_id")
+  classId   Int?     @map("class_id")
+  createdAt DateTime @map("created_at")
+  createdBy Int?     @map("created_by")
+  updatedAt DateTime @map("updated_at")
+  updatedBy Int      @map("updated_by")
+
+  User     User?     @relation(fields: [userId], references: [id])
+  Class    Class?    @relation(fields: [classId], references: [id])
+  Students Student[]
+
+  @@map("enrollment")
+}
