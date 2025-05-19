@@ -1,12 +1,12 @@
 import { NextFunction, Response } from 'express';
-import { UserRequest } from '../../type/userRequest';
+import { UserRequest } from '../type/userRequest';
 import {
   CreateUserRequest,
   UpdateUserRequest,
   UserResponse,
-} from '../../models/userModel';
-import { UserService } from '../../services/userService';
-import { AdminRequest } from '../../type/adminRequest';
+} from '../models/userModel';
+import { UserService } from '../services/userService';
+import { AdminRequest } from '../type/adminRequest';
 
 export class UserController {
   static async update(

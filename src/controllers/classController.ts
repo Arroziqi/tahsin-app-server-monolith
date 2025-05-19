@@ -1,21 +1,21 @@
 import { NextFunction, Response } from 'express';
-import { AdminRequest } from '../../type/adminRequest';
+import { AdminRequest } from '../type/adminRequest';
+import { ClassService } from '../services/classService';
 import {
-  CreateTimeRequest,
-  TimeResponse,
-  UpdateTimeRequest,
-} from '../../models/timeModel';
-import { TimeService } from '../../services/timeService';
+  ClassResponse,
+  CreateClassRequest,
+  UpdateClassRequest,
+} from '../models/classModel';
 
-export class TimeController {
+export class ClassController {
   static async create(
     req: AdminRequest,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
     try {
-      const request: CreateTimeRequest = req.body as CreateTimeRequest;
-      const response: TimeResponse = await TimeService.create(
+      const request: CreateClassRequest = req.body as CreateClassRequest;
+      const response: ClassResponse = await ClassService.create(
         req.admin!,
         request,
       );
@@ -31,8 +31,8 @@ export class TimeController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      const request: UpdateTimeRequest = req.body as UpdateTimeRequest;
-      const response: TimeResponse = await TimeService.update(
+      const request: UpdateClassRequest = req.body as UpdateClassRequest;
+      const response: ClassResponse = await ClassService.update(
         req.admin!,
         request,
       );
@@ -49,7 +49,7 @@ export class TimeController {
   ): Promise<void> {
     try {
       const id: number = Number(req.params.id);
-      const response: TimeResponse = await TimeService.get(id);
+      const response: ClassResponse = await ClassService.get(id);
       res.status(200).json({ data: response });
     } catch (e) {
       next(e);
@@ -62,7 +62,7 @@ export class TimeController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      const response: TimeResponse[] = await TimeService.getAll();
+      const response: ClassResponse[] = await ClassService.getAll();
       res.status(200).json({ data: response });
     } catch (e) {
       next(e);

@@ -1,6 +1,6 @@
 import express, { Router } from 'express';
 import { adminMiddleware } from '../../middlewares/adminMiddleware';
-import { LevelController } from '../../controllers/level/levelController';
+import { LevelController } from '../../controllers/levelController';
 
 export const levelRouter: Router = express.Router();
 levelRouter.use(adminMiddleware);

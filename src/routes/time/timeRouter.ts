@@ -1,6 +1,6 @@
 import express, { Router } from 'express';
 import { adminMiddleware } from '../../middlewares/adminMiddleware';
-import { TimeController } from '../../controllers/time/timeController';
+import { TimeController } from '../../controllers/timeController';
 
 export const timeRouter: Router = express.Router();
 timeRouter.use(adminMiddleware);

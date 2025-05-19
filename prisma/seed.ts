@@ -293,7 +293,7 @@ async function main() {
   const bankAccount = await prisma.bankAccount.create({
     data: {
       accountName: 'Yayasan Quran',
-      accountNumber: '9876543210',
+      accountNumber: 9876543210,
       bankName: 'Bank Muamalat',
       createdAt: now,
       updatedAt: now,

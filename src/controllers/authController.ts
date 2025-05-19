@@ -3,9 +3,9 @@ import {
   CreateUserRequest,
   LoginUserRequest,
   UserResponse,
-} from '../../models/userModel';
-import { UserService } from '../../services/userService';
-import { UserRequest } from '../../type/userRequest';
+} from '../models/userModel';
+import { UserService } from '../services/userService';
+import { UserRequest } from '../type/userRequest';
 
 export class AuthController {
   static login = async (

@@ -1,6 +1,6 @@
 import express, { Router } from 'express';
 import { adminMiddleware } from '../../middlewares/adminMiddleware';
-import { TeacherController } from '../../controllers/teacher/teacherController';
+import { TeacherController } from '../../controllers/teacherController';
 
 export const teacherRouter: Router = express.Router();
 teacherRouter.use(adminMiddleware);

@@ -1,21 +1,21 @@
 import { NextFunction, Response } from 'express';
-import { AdminRequest } from '../../type/adminRequest';
+import { AdminRequest } from '../type/adminRequest';
+import { LevelService } from '../services/levelService';
 import {
-  CreateTeacherRequest,
-  TeacherResponse,
-  UpdateTeacherRequest,
-} from '../../models/teacherModel';
-import { TeacherService } from '../../services/teacherService';
+  CreateLevelRequest,
+  LevelResponse,
+  UpdateLevelRequest,
+} from '../models/levelModel';
 
-export class TeacherController {
+export class LevelController {
   static async create(
     req: AdminRequest,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
     try {
-      const request: CreateTeacherRequest = req.body as CreateTeacherRequest;
-      const response: TeacherResponse = await TeacherService.create(
+      const request: CreateLevelRequest = req.body as CreateLevelRequest;
+      const response: LevelResponse = await LevelService.create(
         req.admin!,
         request,
       );
@@ -31,8 +31,8 @@ export class TeacherController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      const request: UpdateTeacherRequest = req.body as UpdateTeacherRequest;
-      const response: TeacherResponse = await TeacherService.update(
+      const request: UpdateLevelRequest = req.body as UpdateLevelRequest;
+      const response: LevelResponse = await LevelService.update(
         req.admin!,
         request,
       );
@@ -48,8 +48,8 @@ export class TeacherController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      const teacherId: number = Number(req.params.teacherId);
-      const response: TeacherResponse = await TeacherService.get(teacherId);
+      const id: number = Number(req.params.id);
+      const response: LevelResponse = await LevelService.get(id);
       res.status(200).json({ data: response });
     } catch (e) {
       next(e);
@@ -62,7 +62,7 @@ export class TeacherController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      const response: TeacherResponse[] = await TeacherService.getAll();
+      const response: LevelResponse[] = await LevelService.getAll();
       res.status(200).json({ data: response });
     } catch (e) {
       next(e);

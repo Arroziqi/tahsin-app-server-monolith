@@ -117,7 +117,7 @@ model Time {
 
 model Day {
   id        Int       @id @default(autoincrement())
-  day       String
+  day       String    @unique
   createdAt DateTime? @default(now()) @map("created_at")
   createdBy Int?      @map("created_by")
   updatedAt DateTime? @updatedAt @map("updated_at")
@@ -131,7 +131,7 @@ model Day {
 model BankAccount {
   id            Int       @id @default(autoincrement())
   accountName   String    @map("account_name")
-  accountNumber String    @map("account_number")
+  accountNumber Int       @map("account_number")
   bankName      String    @map("bank_name")
   createdAt     DateTime? @default(now()) @map("created_at")
   createdBy     Int?      @map("created_by")
@@ -232,9 +232,9 @@ model Class {
 model Schedule {
   id        Int       @id @default(autoincrement())
   classId   Int       @map("class_id")
-  teacherId Int?      @map("teacher_id")
-  dayId     Int?      @map("day_id")
-  timeId    Int?      @map("time_id")
+  teacherId Int       @map("teacher_id")
+  dayId     Int       @map("day_id")
+  timeId    Int       @map("time_id")
   createdAt DateTime? @default(now()) @map("created_at")
   createdBy Int?      @map("created_by")
   updatedAt DateTime? @updatedAt @map("updated_at")
