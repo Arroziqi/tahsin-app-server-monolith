@@ -67,7 +67,6 @@ export class TeacherService {
   }
 
   static async get(id: number): Promise<TeacherResponse> {
-    console.log('id nih: ', id);
     const data = await dbClient.teacher.findFirst({
       where: { id },
     });

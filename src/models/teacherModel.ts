@@ -1,6 +1,7 @@
 import { Teacher } from '@prisma/client';
 
 export type TeacherResponse = {
+  id: number;
   name: string;
   nip: number;
   accountNumber?: number | null;
@@ -30,6 +31,7 @@ export type UpdateTeacherRequest = {
 
 export function toTeacherResponse(teacher: Teacher): TeacherResponse {
   return {
+    id: teacher.id,
     name: teacher.name,
     nip: teacher.nip,
     accountNumber: teacher.accountNumber,

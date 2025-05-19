@@ -199,7 +199,8 @@ async function main() {
 
   const time = await prisma.time.create({
     data: {
-      time: 1900,
+      startTime: 540,
+      endTime: 660,
       createdAt: now,
       updatedAt: now,
       updatedBy: superAdmin.id,
