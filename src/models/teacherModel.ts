@@ -3,8 +3,8 @@ import { Teacher } from '@prisma/client';
 export type TeacherResponse = {
   id: number;
   name: string;
-  nip: number;
-  accountNumber?: number | null;
+  nip: string;
+  accountNumber?: string | null;
   accountName?: string | null;
   bankName?: string | null;
   userId: number | null;
@@ -13,8 +13,8 @@ export type TeacherResponse = {
 
 export type CreateTeacherRequest = {
   name: string;
-  nip: number;
-  accountNumber?: number;
+  nip: string;
+  accountNumber?: string;
   accountName?: string;
   bankName?: string;
   userId: number;
@@ -23,8 +23,8 @@ export type CreateTeacherRequest = {
 export type UpdateTeacherRequest = {
   id: number;
   name: string;
-  nip: number;
-  accountNumber?: number;
+  nip: string;
+  accountNumber?: string;
   accountName?: string;
   bankName?: string;
 };

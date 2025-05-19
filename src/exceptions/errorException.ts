@@ -10,8 +10,17 @@ export const errorException = async (
   next: NextFunction,
 ): Promise<void> => {
   if (error instanceof ZodError) {
+    const formattedErrors = error.issues.map((issue) => ({
+      code: issue.code,
+      message: issue.message,
+      path: issue.path.join('.'),
+    }));
+
     res.status(400).json({
-      errors: `Validation Error : ${JSON.stringify(error, null, 2)}`,
+      errors: {
+        message: 'Validation Error',
+        details: formattedErrors,
+      },
     });
   } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
     const errorMessage = JSON.stringify(error, null, 2);

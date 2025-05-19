@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { AttendanceStatus, PrismaClient } from '@prisma/client';
 import { hashPassword } from '../src/common/provider/hash';
 
 const prisma = new PrismaClient();
@@ -56,7 +56,7 @@ async function main() {
   await prisma.admin.createMany({
     data: [
       {
-        noAdmin: 1001,
+        noAdmin: '1001',
         name: 'Admin Utama',
         userId: adminUser.id,
         createdAt: now,
@@ -64,7 +64,7 @@ async function main() {
         updatedBy: superAdmin.id,
       },
       {
-        noAdmin: 1002,
+        noAdmin: '1002',
         name: 'Super Admin',
         userId: superAdmin.id,
         createdAt: now,
@@ -78,8 +78,8 @@ async function main() {
   const teacher = await prisma.teacher.create({
     data: {
       name: 'Ustadz Haris',
-      nip: 987654321,
-      accountNumber: 1234567890,
+      nip: '987654321',
+      accountNumber: '1234567890',
       accountName: 'Ust Haris',
       bankName: 'Bank Syariah',
       userId: teacherUser.id,
@@ -257,6 +257,7 @@ async function main() {
   // Score
   await prisma.score.create({
     data: {
+      value: 100,
       studentId: student.id,
       taskId: task.id,
       createdAt: now,
@@ -265,9 +266,10 @@ async function main() {
     },
   });
 
-  // Attendance
+  // Attendance;
   await prisma.attendance.create({
     data: {
+      attendance: AttendanceStatus.ABSENT,
       studentId: student.id,
       scheduleId: schedule.id,
       createdAt: now,
@@ -293,7 +295,7 @@ async function main() {
   const bankAccount = await prisma.bankAccount.create({
     data: {
       accountName: 'Yayasan Quran',
-      accountNumber: 9876543210,
+      accountNumber: '9876543210',
       bankName: 'Bank Muamalat',
       createdAt: now,
       updatedAt: now,
@@ -325,7 +327,6 @@ async function main() {
     data: {
       bankAccountId: bankAccount.id,
       billId: bill.id,
-      studentId: student.id,
       transactionTypeId: transfer.id,
       transactionStatusId: paid.id,
       createdAt: now,

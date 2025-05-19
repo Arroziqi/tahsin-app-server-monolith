@@ -28,7 +28,7 @@ model User {
 
 model Admin {
   id        Int       @id @default(autoincrement())
-  noAdmin   Int       @unique @map("no_admin")
+  noAdmin   String    @unique @map("no_admin")
   name      String
   userId    Int       @unique @map("user_id")
   createdAt DateTime? @default(now()) @map("created_at")
@@ -63,7 +63,6 @@ model Student {
   Scores        Score[]
   Attendances   Attendance[]
   Bills         Bill[]
-  Transactions  Transaction[]
 
   @@map("student")
 }
@@ -71,8 +70,8 @@ model Student {
 model Teacher {
   id            Int       @id @default(autoincrement())
   name          String
-  nip           Int
-  accountNumber Int?      @map("account_number")
+  nip           String
+  accountNumber String?   @map("account_number")
   accountName   String?   @map("account_name")
   bankName      String?   @map("bank_name")
   userId        Int       @unique @map("user_id")
@@ -131,7 +130,7 @@ model Day {
 model BankAccount {
   id            Int       @id @default(autoincrement())
   accountName   String    @map("account_name")
-  accountNumber Int       @map("account_number")
+  accountNumber String    @map("account_number")
   bankName      String    @map("bank_name")
   createdAt     DateTime? @default(now()) @map("created_at")
   createdBy     Int?      @map("created_by")
@@ -282,8 +281,8 @@ model Component {
 model Task {
   id        Int       @id @default(autoincrement())
   moduleId  Int       @map("module_id")
-  teacherId Int?      @map("teacher_id")
-  task      String?
+  teacherId Int       @map("teacher_id")
+  task      String
   createdAt DateTime? @default(now()) @map("created_at")
   createdBy Int?      @map("created_by")
   updatedAt DateTime? @updatedAt @map("updated_at")
@@ -298,6 +297,7 @@ model Task {
 
 model Score {
   id        Int       @id @default(autoincrement())
+  value     Int
   studentId Int       @map("student_id")
   taskId    Int       @map("task_id")
   createdAt DateTime? @default(now()) @map("created_at")
@@ -311,14 +311,21 @@ model Score {
   @@map("score")
 }
 
+enum AttendanceStatus {
+  ABSENT
+  PRESENT
+  EXCUSED
+}
+
 model Attendance {
-  id         Int       @id @default(autoincrement())
-  studentId  Int       @map("student_id")
-  scheduleId Int       @map("schedule_id")
-  createdAt  DateTime? @default(now()) @map("created_at")
-  createdBy  Int?      @map("created_by")
-  updatedAt  DateTime? @updatedAt @map("updated_at")
-  updatedBy  Int?      @map("updated_by")
+  id         Int              @id @default(autoincrement())
+  attendance AttendanceStatus
+  studentId  Int              @map("student_id")
+  scheduleId Int              @map("schedule_id")
+  createdAt  DateTime?        @default(now()) @map("created_at")
+  createdBy  Int?             @map("created_by")
+  updatedAt  DateTime?        @updatedAt @map("updated_at")
+  updatedBy  Int?             @map("updated_by")
 
   Student  Student  @relation(fields: [studentId], references: [id])
   Schedule Schedule @relation(fields: [scheduleId], references: [id])
@@ -329,8 +336,8 @@ model Attendance {
 model Bill {
   id          Int       @id @default(autoincrement())
   studentId   Int       @map("student_id")
-  bill        Int?
-  remainBill  Int?      @map("remain_bill")
+  bill        Int
+  remainBill  Int       @map("remain_bill")
   description String?
   createdAt   DateTime? @default(now()) @map("created_at")
   createdBy   Int?      @map("created_by")
@@ -346,10 +353,9 @@ model Bill {
 model Transaction {
   id                  Int       @id @default(autoincrement())
   bankAccountId       Int       @map("bank_account_id")
-  billId              Int?      @map("bill_id")
-  studentId           Int       @map("student_id")
-  transactionTypeId   Int?      @map("transaction_type_id")
-  transactionStatusId Int?      @map("transaction_status_id")
+  billId              Int       @map("bill_id")
+  transactionTypeId   Int       @map("transaction_type_id")
+  transactionStatusId Int       @map("transaction_status_id")
   createdAt           DateTime? @default(now()) @map("created_at")
   createdBy           Int?      @map("created_by")
   updatedAt           DateTime? @updatedAt @map("updated_at")
@@ -357,7 +363,6 @@ model Transaction {
 
   BankAccount       BankAccount        @relation(fields: [bankAccountId], references: [id])
   Bill              Bill?              @relation(fields: [billId], references: [id])
-  Student           Student            @relation(fields: [studentId], references: [id])
   TransactionType   TransactionType?   @relation(fields: [transactionTypeId], references: [id])
   TransactionStatus TransactionStatus? @relation(fields: [transactionStatusId], references: [id])
 
@@ -366,8 +371,8 @@ model Transaction {
 
 model Enrollment {
   id        Int       @id @default(autoincrement())
-  userId    Int?      @map("user_id")
-  classId   Int?      @map("class_id")
+  userId    Int       @map("user_id")
+  classId   Int       @map("class_id")
   createdAt DateTime? @default(now()) @map("created_at")
   createdBy Int?      @map("created_by")
   updatedAt DateTime? @updatedAt @map("updated_at")

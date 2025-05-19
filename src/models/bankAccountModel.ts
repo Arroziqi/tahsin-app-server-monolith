@@ -3,21 +3,21 @@ import { BankAccount } from '@prisma/client';
 export type BankAccountResponse = {
   id: number;
   accountName: string;
-  accountNumber: number;
+  accountNumber: string;
   bankName: string;
   createdBy: number | null;
 };
 
 export type CreateBankAccountRequest = {
   accountName: string;
-  accountNumber: number;
+  accountNumber: string;
   bankName: string;
 };
 
 export type UpdateBankAccountRequest = {
   id: number;
   accountName: string;
-  accountNumber: number;
+  accountNumber: string;
   bankName: string;
 };
 
