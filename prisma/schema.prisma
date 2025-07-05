@@ -7,12 +7,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  USER
+  ADMIN
+  STUDENT
+  TEACHER
+}
+
 model User {
   id        Int       @id @default(autoincrement())
   username  String    @unique
   email     String    @unique
   password  String
   token     String?   @unique
+  role      Role      @default(USER)
   createdAt DateTime? @default(now()) @map("created_at")
   createdBy Int?      @map("created_by")
   updatedAt DateTime? @updatedAt @map("updated_at")
@@ -70,7 +78,8 @@ model Student {
 model Teacher {
   id            Int       @id @default(autoincrement())
   name          String
-  nip           String
+  noTelp        String    @map("no_telp")
+  nip           String?
   accountNumber String?   @map("account_number")
   accountName   String?   @map("account_name")
   bankName      String?   @map("bank_name")
@@ -369,18 +378,63 @@ model Transaction {
   @@map("transaction")
 }
 
+enum Education {
+  SMA
+  SARJANA
+  MAGISTER
+}
+
+enum Program {
+  DASAR
+  MENENGAH
+  LANJUTAN
+}
+
+enum ClassType {
+  ONLINE
+  OFFLINE
+}
+
+enum TimeOfStudy {
+  MORNING
+  AFTERNOON
+}
+
 model Enrollment {
-  id        Int       @id @default(autoincrement())
-  userId    Int       @map("user_id")
-  classId   Int       @map("class_id")
-  createdAt DateTime? @default(now()) @map("created_at")
-  createdBy Int?      @map("created_by")
-  updatedAt DateTime? @updatedAt @map("updated_at")
-  updatedBy Int?      @map("updated_by")
+  id                Int         @id @default(autoincrement())
+  fullName          String      @map("full_name")
+  dateOfBirth       DateTime    @map("date_of_birth")
+  noTelp            String      @map("no_telp")
+  email             String      @map("email")
+  lastEducation     Education   @map("last_education")
+  program           Program
+  classType         ClassType   @map("class_type")
+  timeOfStudy       TimeOfStudy @map("time_of_study")
+  motivation        String
+  voiceRecording    String?     @map("voice_recording")
+  dateOfReservation DateTime?   @map("date_of_reservation")
+  userId            Int         @map("user_id")
+  classId           Int         @map("class_id")
+  createdAt         DateTime?   @default(now()) @map("created_at")
+  createdBy         Int?        @map("created_by")
+  updatedAt         DateTime?   @updatedAt @map("updated_at")
+  updatedBy         Int?        @map("updated_by")
 
   User     User?     @relation(fields: [userId], references: [id])
   Class    Class?    @relation(fields: [classId], references: [id])
   Students Student[]
 
   @@map("enrollment")
+}
+
+model Announcement {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String
+  createdAt   DateTime? @default(now()) @map("created_at")
+  createdBy   Int?      @map("created_by")
+  updatedAt   DateTime? @updatedAt @map("updated_at")
+  updatedBy   Int?      @map("updated_by")
+
+  @@map("announcement")
 }

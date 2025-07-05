@@ -1,10 +1,11 @@
-import { User } from '@prisma/client';
+import { Role, User } from '@prisma/client';
 
 export type UserResponse = {
   id: number;
   username: string;
   email: string;
   token?: string;
+  role: Role;
 };
 
 export type CreateUserRequest = {
@@ -28,5 +29,6 @@ export function toUserResponse(user: User): UserResponse {
     id: user.id,
     username: user.username,
     email: user.email,
+    role: user.role,
   };
 }

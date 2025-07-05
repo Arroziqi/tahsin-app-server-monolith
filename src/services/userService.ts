@@ -11,7 +11,7 @@ import { dbClient } from '../common/provider/database';
 import { BadRequest } from '../exceptions/error/badRequest';
 import { hashPassword, verifyPassword } from '../common/provider/hash';
 import { generateToken } from '../common/provider/generateToken';
-import { Admin, User } from '@prisma/client';
+import { User } from '@prisma/client';
 
 export class UserService {
   static async register(req: CreateUserRequest): Promise<UserResponse> {
@@ -121,7 +121,7 @@ export class UserService {
   }
 
   static async create(
-    admin: Admin,
+    user: User,
     req: CreateUserRequest,
   ): Promise<UserResponse> {
     const validRequest: CreateUserRequest = Validation.validate(
@@ -142,7 +142,7 @@ export class UserService {
     validRequest.password = await hashPassword(validRequest.password);
 
     const data = await dbClient.user.create({
-      data: { ...validRequest, createdBy: admin.id },
+      data: { ...validRequest, createdBy: user.id },
     });
 
     return toUserResponse(data);

@@ -1,7 +1,7 @@
 import { Validation } from '../common/type/validation';
 import { dbClient } from '../common/provider/database';
 import { BadRequest } from '../exceptions/error/badRequest';
-import { Admin, Enrollment } from '@prisma/client';
+import { Admin, Enrollment, User } from '@prisma/client';
 import {
   CreateEnrollmentRequest,
   EnrollmentResponse,
@@ -34,6 +34,34 @@ export class EnrollmentService {
 
     const data = await dbClient.enrollment.create({
       data: { ...validRequest, createdBy: admin.id },
+    });
+
+    return toEnrollmentResponse(data);
+  }
+
+  static async register(
+    user: User,
+    req: CreateEnrollmentRequest,
+  ): Promise<EnrollmentResponse> {
+    const validRequest: CreateEnrollmentRequest = Validation.validate(
+      EnrollmentSchemaValidation.CREATE,
+      { ...req, userId: user.id },
+    );
+
+    const totalEnrollmentWithSameEnrollment: number =
+      await dbClient.enrollment.count({
+        where: {
+          userId: validRequest.userId,
+          classId: validRequest.classId,
+        },
+      });
+
+    if (totalEnrollmentWithSameEnrollment !== 0) {
+      throw new BadRequest('duplicate enrollment');
+    }
+
+    const data = await dbClient.enrollment.create({
+      data: { ...validRequest, createdBy: user.id },
     });
 
     return toEnrollmentResponse(data);

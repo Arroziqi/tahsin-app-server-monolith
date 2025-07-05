@@ -1,9 +1,7 @@
 import express, { Router } from 'express';
-import { adminMiddleware } from '../../middlewares/adminMiddleware';
 import { TransactionStatusController } from '../../controllers/transactionStatusController';
 
 export const transactionStatusRouter: Router = express.Router();
-transactionStatusRouter.use(adminMiddleware);
 transactionStatusRouter.post(
   '/api/transactionStatus/create',
   TransactionStatusController.create,

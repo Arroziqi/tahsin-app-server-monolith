@@ -53,14 +53,14 @@ export class UserController {
   }
 
   static async create(
-    req: AdminRequest,
+    req: UserRequest,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
     try {
       const request: CreateUserRequest = req.body as CreateUserRequest;
       const response: UserResponse = await UserService.create(
-        req.admin!,
+        req.user!,
         request,
       );
       res.status(200).json({ data: response });

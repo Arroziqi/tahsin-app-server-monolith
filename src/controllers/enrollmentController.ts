@@ -6,6 +6,7 @@ import {
   EnrollmentResponse,
   UpdateEnrollmentRequest,
 } from '../models/enrollmentModel';
+import { UserRequest } from '../type/userRequest';
 
 export class EnrollmentController {
   static async create(
@@ -18,6 +19,24 @@ export class EnrollmentController {
         req.body as CreateEnrollmentRequest;
       const response: EnrollmentResponse = await EnrollmentService.create(
         req.admin!,
+        request,
+      );
+      res.status(200).json({ data: response });
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  static async register(
+    req: UserRequest,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const request: CreateEnrollmentRequest =
+        req.body as CreateEnrollmentRequest;
+      const response: EnrollmentResponse = await EnrollmentService.register(
+        req.user!,
         request,
       );
       res.status(200).json({ data: response });

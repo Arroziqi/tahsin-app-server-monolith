@@ -1,4 +1,12 @@
-import { AttendanceStatus, PrismaClient } from '@prisma/client';
+import {
+  AttendanceStatus,
+  ClassType,
+  Education,
+  PrismaClient,
+  Program,
+  Role,
+  TimeOfStudy,
+} from '@prisma/client';
 import { hashPassword } from '../src/common/provider/hash';
 
 const prisma = new PrismaClient();
@@ -13,6 +21,7 @@ async function main() {
       username: 'superadmin',
       email: 'superadmin@example.com',
       password: password,
+      role: Role.ADMIN,
       createdAt: now,
       updatedAt: now,
       updatedBy: 1,
@@ -24,6 +33,7 @@ async function main() {
       username: 'admin1',
       email: 'admin@example.com',
       password: password,
+      role: Role.ADMIN,
       createdAt: now,
       updatedAt: now,
       updatedBy: superAdmin.id,
@@ -79,6 +89,7 @@ async function main() {
     data: {
       name: 'Ustadz Haris',
       nip: '987654321',
+      noTelp: '987654321',
       accountNumber: '1234567890',
       accountName: 'Ust Haris',
       bankName: 'Bank Syariah',
@@ -163,6 +174,16 @@ async function main() {
   // Enrollment
   const enrollment = await prisma.enrollment.create({
     data: {
+      fullName: 'Student Fullname',
+      dateOfBirth: new Date(),
+      noTelp: '089898989',
+      email: 'asas@gmail.com',
+      lastEducation: Education.SMA,
+      program: Program.DASAR,
+      classType: ClassType.ONLINE,
+      timeOfStudy: TimeOfStudy.MORNING,
+      motivation: 'belajar',
+      voiceRecording: 'voice',
       userId: studentUser.id,
       classId: kelas.id,
       createdAt: now,
