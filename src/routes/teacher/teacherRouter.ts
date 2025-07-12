@@ -8,5 +8,9 @@ teacherRouter.post(
   TeacherController.createUserTeacher,
 );
 teacherRouter.patch('/api/teacher/update', TeacherController.update);
+teacherRouter.patch(
+  '/api/teacher/update-status',
+  TeacherController.updateTeacherStatus,
+);
 teacherRouter.get('/api/teacher/get/:teacherId', TeacherController.get);
 teacherRouter.get('/api/teacher/getAll', TeacherController.getAll);

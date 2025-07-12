@@ -9,7 +9,7 @@ import { Role } from '@prisma/client';
 import cors from 'cors';
 
 const allowedOrigins = [
-  'http://localhost:3001', // Next.js web (dev)
+  'http://localhost:3000', // Next.js web (dev)
   'http://192.168.1.24:8081', // Expo web dev (optional)
   'exp://192.168.1.24:8081', // Expo Go (emulator/device, optional)
   'http://192.168.1.24:19000', // Kadang Expo DevTools pakai ini

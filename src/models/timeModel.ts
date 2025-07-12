@@ -3,20 +3,26 @@ import { minutesToHHMM } from '../common/utils/time';
 
 export type TimeResponse = {
   id: number;
+  session: string;
   startTime: string;
   endTime: string;
+  isActive?: boolean;
   createdBy: number | null;
 };
 
 export type CreateTimeRequest = {
+  session: string;
   startTime: string;
   endTime: string;
+  isActive?: boolean;
 };
 
 export type UpdateTimeRequest = {
-  id: number;
-  startTime: string;
-  endTime: string;
+  id?: number;
+  session?: string;
+  startTime?: string;
+  endTime?: string;
+  isActive?: boolean;
 };
 
 export function toTimeResponse(time: Time): TimeResponse {
@@ -25,8 +31,10 @@ export function toTimeResponse(time: Time): TimeResponse {
 
   return {
     id: time.id,
+    session: time.session,
     startTime: startTime,
     endTime: endTime,
+    isActive: time.isActive,
     createdBy: time.createdBy,
   };
 }

@@ -1,10 +1,11 @@
-import { Teacher, User } from '@prisma/client';
+import { Teacher, TeacherStatus, User } from '@prisma/client';
 
 export type TeacherResponse = {
   id: number;
   name: string;
   nip?: string;
   noTelp: string;
+  status: TeacherStatus;
   accountNumber?: string | null;
   accountName?: string | null;
   bankName?: string | null;
@@ -41,13 +42,19 @@ export type CreateUserTeacherRequest = {
 };
 
 export type UpdateTeacherRequest = {
-  id: number;
-  name: string;
-  noTelp: string;
+  id?: number;
+  name?: string;
+  noTelp?: string;
+  status?: TeacherStatus;
   nip?: string;
   accountNumber?: string;
   accountName?: string;
   bankName?: string;
+};
+
+export type UpdateTeacherStatusRequest = {
+  id: number;
+  status: TeacherStatus;
 };
 
 export function toTeacherResponse(
@@ -58,6 +65,7 @@ export function toTeacherResponse(
     name: teacher.name,
     noTelp: teacher.noTelp,
     nip: teacher.nip ?? undefined,
+    status: teacher.status,
     accountNumber: teacher.accountNumber,
     accountName: teacher.accountName,
     bankName: teacher.bankName,

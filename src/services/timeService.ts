@@ -1,7 +1,7 @@
 import { Validation } from '../common/type/validation';
 import { dbClient } from '../common/provider/database';
 import { BadRequest } from '../exceptions/error/badRequest';
-import { Admin, Time } from '@prisma/client';
+import { Time, User } from '@prisma/client';
 import { TimeSchemaValidation } from '../schemas/timeSchemaValidation';
 import {
   CreateTimeRequest,
@@ -12,8 +12,26 @@ import {
 import { hhmmToMinutes } from '../common/utils/time';
 
 export class TimeService {
+  private static async isOverlapping(
+    startMinutes: number,
+    endMinutes: number,
+    excludeId?: number,
+  ): Promise<boolean> {
+    const conflict = await dbClient.time.findFirst({
+      where: {
+        NOT: excludeId ? { id: excludeId } : undefined,
+        AND: [
+          { startTime: { lt: endMinutes } },
+          { endTime: { gt: startMinutes } },
+        ],
+      },
+    });
+
+    return !!conflict;
+  }
+
   static async create(
-    admin: Admin,
+    user: User,
     req: CreateTimeRequest,
   ): Promise<TimeResponse> {
     let validRequest: CreateTimeRequest = Validation.validate(
@@ -26,6 +44,14 @@ export class TimeService {
 
     if (endMinutes <= startMinutes) {
       throw new BadRequest('End time must be after start time');
+    }
+
+    if (endMinutes - startMinutes !== 120) {
+      throw new BadRequest('Time must be 2 hours');
+    }
+
+    if (await this.isOverlapping(startMinutes, endMinutes)) {
+      throw new BadRequest('Time overlaps with existing session');
     }
 
     const totalTimeWithSameTime: number = await dbClient.time.count({
@@ -41,9 +67,11 @@ export class TimeService {
 
     const data = await dbClient.time.create({
       data: {
-        createdBy: admin.id,
+        session: validRequest.session,
+        createdBy: user.id,
         startTime: startMinutes,
         endTime: endMinutes,
+        isActive: validRequest.isActive,
       },
     });
 
@@ -51,7 +79,7 @@ export class TimeService {
   }
 
   static async update(
-    admin: Admin,
+    user: User,
     req: UpdateTimeRequest,
   ): Promise<TimeResponse> {
     let validRequest: UpdateTimeRequest = Validation.validate(
@@ -59,11 +87,19 @@ export class TimeService {
       req,
     );
 
-    const startMinutes = hhmmToMinutes(validRequest.startTime);
-    const endMinutes = hhmmToMinutes(validRequest.endTime);
+    const startMinutes = hhmmToMinutes(validRequest.startTime!);
+    const endMinutes = hhmmToMinutes(validRequest.endTime!);
 
     if (endMinutes <= startMinutes) {
       throw new BadRequest('End time must be after start time');
+    }
+
+    if (endMinutes - startMinutes !== 120) {
+      throw new BadRequest('Time must be 2 hours');
+    }
+
+    if (await this.isOverlapping(startMinutes, endMinutes)) {
+      throw new BadRequest('Time overlaps with existing session');
     }
 
     const existingData = await dbClient.time.findFirst({
@@ -81,9 +117,11 @@ export class TimeService {
         id: validRequest.id,
       },
       data: {
+        session: validRequest.session,
         startTime: startMinutes,
         endTime: endMinutes,
-        updatedBy: admin.id,
+        updatedBy: user.id,
+        isActive: validRequest.isActive,
       },
     });
 

@@ -8,6 +8,7 @@ import {
   TeacherResponse,
   toTeacherResponse,
   UpdateTeacherRequest,
+  UpdateTeacherStatusRequest,
 } from '../models/teacherModel';
 import { TeacherSchemaValidation } from '../schemas/teacherSchemaValidation';
 import { UserService } from './userService';
@@ -85,6 +86,35 @@ export class TeacherService {
   ): Promise<TeacherResponse> {
     const validRequest: UpdateTeacherRequest = Validation.validate(
       TeacherSchemaValidation.UPDATE,
+      req,
+    );
+
+    const existingData = await dbClient.teacher.findFirst({
+      where: {
+        id: validRequest.id,
+      },
+    });
+
+    if (!existingData) {
+      throw new BadRequest('data does not exist');
+    }
+
+    const result = await dbClient.teacher.update({
+      where: {
+        id: validRequest.id,
+      },
+      data: { ...validRequest, updatedBy: user.id },
+    });
+
+    return toTeacherResponse(result);
+  }
+
+  static async updateStatus(
+    user: User,
+    req: UpdateTeacherStatusRequest,
+  ): Promise<TeacherResponse> {
+    const validRequest: UpdateTeacherStatusRequest = Validation.validate(
+      TeacherSchemaValidation.UPDATETEACHERSTATUS,
       req,
     );
 

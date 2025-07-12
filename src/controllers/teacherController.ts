@@ -4,6 +4,7 @@ import {
   CreateUserTeacherRequest,
   TeacherResponse,
   UpdateTeacherRequest,
+  UpdateTeacherStatusRequest,
 } from '../models/teacherModel';
 import { TeacherService } from '../services/teacherService';
 import { UserRequest } from '../type/userRequest';
@@ -52,6 +53,24 @@ export class TeacherController {
     try {
       const request: UpdateTeacherRequest = req.body as UpdateTeacherRequest;
       const response: TeacherResponse = await TeacherService.update(
+        req.user!,
+        request,
+      );
+      res.status(200).json({ data: response });
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  static async updateTeacherStatus(
+    req: UserRequest,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const request: UpdateTeacherStatusRequest =
+        req.body as UpdateTeacherStatusRequest;
+      const response: TeacherResponse = await TeacherService.updateStatus(
         req.user!,
         request,
       );

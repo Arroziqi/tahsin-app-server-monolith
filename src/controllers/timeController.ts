@@ -1,22 +1,22 @@
 import { NextFunction, Response } from 'express';
-import { AdminRequest } from '../type/adminRequest';
 import {
   CreateTimeRequest,
   TimeResponse,
   UpdateTimeRequest,
 } from '../models/timeModel';
 import { TimeService } from '../services/timeService';
+import { UserRequest } from '../type/userRequest';
 
 export class TimeController {
   static async create(
-    req: AdminRequest,
+    req: UserRequest,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
     try {
       const request: CreateTimeRequest = req.body as CreateTimeRequest;
       const response: TimeResponse = await TimeService.create(
-        req.admin!,
+        req.user!,
         request,
       );
       res.status(200).json({ data: response });
@@ -26,14 +26,14 @@ export class TimeController {
   }
 
   static async update(
-    req: AdminRequest,
+    req: UserRequest,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
     try {
       const request: UpdateTimeRequest = req.body as UpdateTimeRequest;
       const response: TimeResponse = await TimeService.update(
-        req.admin!,
+        req.user!,
         request,
       );
       res.status(200).json({ data: response });
@@ -43,7 +43,7 @@ export class TimeController {
   }
 
   static async get(
-    req: AdminRequest,
+    req: UserRequest,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -57,7 +57,7 @@ export class TimeController {
   }
 
   static async getAll(
-    req: AdminRequest,
+    req: UserRequest,
     res: Response,
     next: NextFunction,
   ): Promise<void> {

@@ -5,6 +5,7 @@ export type BankAccountResponse = {
   accountName: string;
   accountNumber: string;
   bankName: string;
+  isActive?: boolean;
   createdBy: number | null;
 };
 
@@ -19,6 +20,7 @@ export type UpdateBankAccountRequest = {
   accountName: string;
   accountNumber: string;
   bankName: string;
+  isActive?: boolean;
 };
 
 export function toBankAccountResponse(
@@ -29,6 +31,7 @@ export function toBankAccountResponse(
     accountName: bankAccount.accountName,
     accountNumber: bankAccount.accountNumber,
     bankName: bankAccount.bankName,
+    isActive: bankAccount.isActive,
     createdBy: bankAccount.createdBy,
   };
 }

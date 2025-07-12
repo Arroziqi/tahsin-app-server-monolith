@@ -1,24 +1,21 @@
 import { NextFunction, Response } from 'express';
-import { AdminRequest } from '../type/adminRequest';
 import {
   CreateDayRequest,
   DayResponse,
   UpdateDayRequest,
 } from '../models/dayModel';
 import { DayService } from '../services/dayService';
+import { UserRequest } from '../type/userRequest';
 
 export class DayController {
   static async create(
-    req: AdminRequest,
+    req: UserRequest,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
     try {
       const request: CreateDayRequest = req.body as CreateDayRequest;
-      const response: DayResponse = await DayService.create(
-        req.admin!,
-        request,
-      );
+      const response: DayResponse = await DayService.create(req.user!, request);
       res.status(200).json({ data: response });
     } catch (e) {
       next(e);
@@ -26,16 +23,13 @@ export class DayController {
   }
 
   static async update(
-    req: AdminRequest,
+    req: UserRequest,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
     try {
       const request: UpdateDayRequest = req.body as UpdateDayRequest;
-      const response: DayResponse = await DayService.update(
-        req.admin!,
-        request,
-      );
+      const response: DayResponse = await DayService.update(req.user!, request);
       res.status(200).json({ data: response });
     } catch (e) {
       next(e);
@@ -43,7 +37,7 @@ export class DayController {
   }
 
   static async get(
-    req: AdminRequest,
+    req: UserRequest,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -57,7 +51,7 @@ export class DayController {
   }
 
   static async getAll(
-    req: AdminRequest,
+    req: UserRequest,
     res: Response,
     next: NextFunction,
   ): Promise<void> {

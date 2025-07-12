@@ -6,6 +6,8 @@ export type ScheduleResponse = {
   teacherId: number;
   dayId: number;
   timeId: number;
+  isActive?: boolean;
+
   createdBy: number | null;
 };
 
@@ -22,6 +24,7 @@ export type UpdateScheduleRequest = {
   teacherId: number;
   dayId: number;
   timeId: number;
+  isActive?: boolean;
 };
 
 export function toScheduleResponse(schedule: Schedule): ScheduleResponse {
@@ -31,6 +34,7 @@ export function toScheduleResponse(schedule: Schedule): ScheduleResponse {
     teacherId: schedule.teacherId,
     dayId: schedule.dayId,
     timeId: schedule.timeId,
+    isActive: schedule.isActive,
     createdBy: schedule.createdBy,
   };
 }

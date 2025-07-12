@@ -75,19 +75,26 @@ model Student {
   @@map("student")
 }
 
+enum TeacherStatus {
+  ACTIVE
+  ON_LEAVE
+  RESIGNED
+}
+
 model Teacher {
-  id            Int       @id @default(autoincrement())
+  id            Int           @id @default(autoincrement())
   name          String
-  noTelp        String    @map("no_telp")
+  noTelp        String        @unique @map("no_telp")
+  status        TeacherStatus @default(ACTIVE)
   nip           String?
-  accountNumber String?   @map("account_number")
-  accountName   String?   @map("account_name")
-  bankName      String?   @map("bank_name")
-  userId        Int       @unique @map("user_id")
-  createdAt     DateTime? @default(now()) @map("created_at")
-  createdBy     Int?      @map("created_by")
-  updatedAt     DateTime? @updatedAt @map("updated_at")
-  updatedBy     Int?      @map("updated_by")
+  accountNumber String?       @map("account_number")
+  accountName   String?       @map("account_name")
+  bankName      String?       @map("bank_name")
+  userId        Int           @unique @map("user_id")
+  createdAt     DateTime?     @default(now()) @map("created_at")
+  createdBy     Int?          @map("created_by")
+  updatedAt     DateTime?     @updatedAt @map("updated_at")
+  updatedBy     Int?          @map("updated_by")
 
   User      User       @relation(fields: [userId], references: [id])
   Schedules Schedule[]
@@ -99,6 +106,7 @@ model Teacher {
 model Level {
   id        Int       @id @default(autoincrement())
   level     String    @unique
+  isActive  Boolean   @default(true)
   createdAt DateTime? @default(now()) @map("created_at")
   createdBy Int?      @map("created_by")
   updatedAt DateTime? @updatedAt @map("updated_at")
@@ -111,8 +119,10 @@ model Level {
 
 model Time {
   id        Int       @id @default(autoincrement())
+  session   String
   startTime Int
   endTime   Int
+  isActive  Boolean   @default(true)
   createdAt DateTime? @default(now()) @map("created_at")
   createdBy Int?      @map("created_by")
   updatedAt DateTime? @updatedAt @map("updated_at")
@@ -126,6 +136,7 @@ model Time {
 model Day {
   id        Int       @id @default(autoincrement())
   day       String    @unique
+  isActive  Boolean   @default(true)
   createdAt DateTime? @default(now()) @map("created_at")
   createdBy Int?      @map("created_by")
   updatedAt DateTime? @updatedAt @map("updated_at")
@@ -141,6 +152,7 @@ model BankAccount {
   accountName   String    @map("account_name")
   accountNumber String    @map("account_number")
   bankName      String    @map("bank_name")
+  isActive      Boolean   @default(true)
   createdAt     DateTime? @default(now()) @map("created_at")
   createdBy     Int?      @map("created_by")
   updatedAt     DateTime? @updatedAt @map("updated_at")
@@ -243,6 +255,7 @@ model Schedule {
   teacherId Int       @map("teacher_id")
   dayId     Int       @map("day_id")
   timeId    Int       @map("time_id")
+  isActive  Boolean   @default(true)
   createdAt DateTime? @default(now()) @map("created_at")
   createdBy Int?      @map("created_by")
   updatedAt DateTime? @updatedAt @map("updated_at")
@@ -404,7 +417,7 @@ model Enrollment {
   id                Int         @id @default(autoincrement())
   fullName          String      @map("full_name")
   dateOfBirth       DateTime    @map("date_of_birth")
-  noTelp            String      @map("no_telp")
+  noTelp            String      @unique @map("no_telp")
   email             String      @map("email")
   lastEducation     Education   @map("last_education")
   program           Program

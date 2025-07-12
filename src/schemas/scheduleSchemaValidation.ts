@@ -13,5 +13,6 @@ export class ScheduleSchemaValidation {
     teacherId: z.number().optional(),
     dayId: z.number().optional(),
     timeId: z.number().optional(),
+    isActive: z.boolean().optional(),
   });
 }

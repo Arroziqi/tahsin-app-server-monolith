@@ -11,5 +11,6 @@ export class BankAccountSchemaValidation {
     accountName: z.string().min(2).max(100).optional(),
     accountNumber: z.string().optional(),
     bankName: z.string().min(2).max(100).optional(),
+    isActive: z.boolean().optional(),
   });
 }

@@ -13,7 +13,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   const now = new Date();
-  const password = await hashPassword('password123');
+  const password = await hashPassword('pass1234');
 
   // Users
   const superAdmin = await prisma.user.create({
@@ -220,6 +220,7 @@ async function main() {
 
   const time = await prisma.time.create({
     data: {
+      session: 'Pagi',
       startTime: 540,
       endTime: 660,
       createdAt: now,

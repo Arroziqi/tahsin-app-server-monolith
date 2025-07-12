@@ -1,7 +1,7 @@
 import { Validation } from '../common/type/validation';
 import { dbClient } from '../common/provider/database';
 import { BadRequest } from '../exceptions/error/badRequest';
-import { Admin, Day } from '@prisma/client';
+import { Day, User } from '@prisma/client';
 import { DaySchemaValidation } from '../schemas/daySchemaValidation';
 import {
   CreateDayRequest,
@@ -11,10 +11,7 @@ import {
 } from '../models/dayModel';
 
 export class DayService {
-  static async create(
-    admin: Admin,
-    req: CreateDayRequest,
-  ): Promise<DayResponse> {
+  static async create(user: User, req: CreateDayRequest): Promise<DayResponse> {
     const validRequest: CreateDayRequest = Validation.validate(
       DaySchemaValidation.CREATE,
       req,
@@ -31,16 +28,13 @@ export class DayService {
     }
 
     const data = await dbClient.day.create({
-      data: { ...validRequest, createdBy: admin.id },
+      data: { ...validRequest, createdBy: user.id },
     });
 
     return toDayResponse(data);
   }
 
-  static async update(
-    admin: Admin,
-    req: UpdateDayRequest,
-  ): Promise<DayResponse> {
+  static async update(user: User, req: UpdateDayRequest): Promise<DayResponse> {
     const validRequest: UpdateDayRequest = Validation.validate(
       DaySchemaValidation.UPDATE,
       req,
@@ -60,7 +54,7 @@ export class DayService {
       where: {
         id: validRequest.id,
       },
-      data: { ...validRequest, updatedBy: admin.id },
+      data: { ...validRequest, updatedBy: user.id },
     });
 
     return toDayResponse(result);
