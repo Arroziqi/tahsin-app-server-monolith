@@ -251,21 +251,24 @@ model Class {
 
 model Schedule {
   id        Int       @id @default(autoincrement())
-  classId   Int       @map("class_id")
-  teacherId Int       @map("teacher_id")
   dayId     Int       @map("day_id")
   timeId    Int       @map("time_id")
+  classType ClassType @default(OFFLINE)
   isActive  Boolean   @default(true)
   createdAt DateTime? @default(now()) @map("created_at")
   createdBy Int?      @map("created_by")
   updatedAt DateTime? @updatedAt @map("updated_at")
   updatedBy Int?      @map("updated_by")
 
-  Class       Class        @relation(fields: [classId], references: [id])
-  Teacher     Teacher?     @relation(fields: [teacherId], references: [id])
-  Day         Day?         @relation(fields: [dayId], references: [id])
-  Time        Time?        @relation(fields: [timeId], references: [id])
-  Attendances Attendance[]
+  Day            Day?             @relation(fields: [dayId], references: [id])
+  Time           Time?            @relation(fields: [timeId], references: [id])
+  Attendances    Attendance[]
+  Teacher        Teacher?         @relation(fields: [teacherId], references: [id])
+  teacherId      Int?
+  Class          Class?           @relation(fields: [classId], references: [id])
+  classId        Int?
+  Event          Event[]
+  AcademicPeriod AcademicPeriod[]
 
   @@map("schedule")
 }
@@ -387,6 +390,7 @@ model Transaction {
   Bill              Bill?              @relation(fields: [billId], references: [id])
   TransactionType   TransactionType?   @relation(fields: [transactionTypeId], references: [id])
   TransactionStatus TransactionStatus? @relation(fields: [transactionStatusId], references: [id])
+  Event             Event[]
 
   @@map("transaction")
 }
@@ -450,4 +454,37 @@ model Announcement {
   updatedBy   Int?      @map("updated_by")
 
   @@map("announcement")
+}
+
+model Event {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  isActive  Boolean   @default(true)
+  createdAt DateTime? @default(now()) @map("created_at")
+  createdBy Int?      @map("created_by")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  updatedBy Int?      @map("updated_by")
+
+  Schedule    Schedule[]
+  Transaction Transaction[]
+
+  @@map("event")
+}
+
+model AcademicPeriod {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  startDate   DateTime
+  endDate     DateTime
+  description String?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime? @default(now()) @map("created_at")
+  createdBy   Int?      @map("created_by")
+  updatedAt   DateTime? @updatedAt @map("updated_at")
+  updatedBy   Int?      @map("updated_by")
+
+  // Relations
+  Schedules Schedule[]
+
+  @@map("academic_period")
 }

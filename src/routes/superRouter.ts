@@ -23,6 +23,8 @@ import { studentRouter } from './student/studentRouter';
 import { adminRouter } from './admin/adminRouter';
 import { enrollmentRouter } from './enrollment/enrollmentRouter';
 import { announcementRouter } from './announcement/announcementRouter';
+import { eventRouter } from './event/eventRouter';
+import { academicPeriodRouter } from './academicPeriod/academicPeriodRouter';
 
 export const superRouter: Router = express.Router();
 superRouter.use(userRouter);
@@ -49,3 +51,5 @@ superRouter.use(enrollmentRouter);
 superRouter.use(studentRouter);
 superRouter.use(adminRouter);
 superRouter.use(announcementRouter);
+superRouter.use(eventRouter);
+superRouter.use(academicPeriodRouter);

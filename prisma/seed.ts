@@ -232,10 +232,9 @@ async function main() {
   // Schedule
   const schedule = await prisma.schedule.create({
     data: {
-      classId: kelas.id,
-      teacherId: teacher.id,
       dayId: day.id,
       timeId: time.id,
+      classType: ClassType.ONLINE,
       createdAt: now,
       updatedAt: now,
       updatedBy: superAdmin.id,

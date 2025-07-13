@@ -1,7 +1,7 @@
 import { Validation } from '../common/type/validation';
 import { dbClient } from '../common/provider/database';
 import { BadRequest } from '../exceptions/error/badRequest';
-import { Admin, BankAccount } from '@prisma/client';
+import { BankAccount, User } from '@prisma/client';
 import {
   BankAccountResponse,
   CreateBankAccountRequest,
@@ -12,7 +12,7 @@ import { BankAccountSchemaValidation } from '../schemas/bankAccountSchemaValidat
 
 export class BankAccountService {
   static async create(
-    admin: Admin,
+    user: User,
     req: CreateBankAccountRequest,
   ): Promise<BankAccountResponse> {
     const validRequest: CreateBankAccountRequest = Validation.validate(
@@ -32,14 +32,14 @@ export class BankAccountService {
     }
 
     const data = await dbClient.bankAccount.create({
-      data: { ...validRequest, createdBy: admin.id },
+      data: { ...validRequest, createdBy: user.id },
     });
 
     return toBankAccountResponse(data);
   }
 
   static async update(
-    admin: Admin,
+    user: User,
     req: UpdateBankAccountRequest,
   ): Promise<BankAccountResponse> {
     const validRequest: UpdateBankAccountRequest = Validation.validate(
@@ -61,7 +61,7 @@ export class BankAccountService {
       where: {
         id: validRequest.id,
       },
-      data: { ...validRequest, updatedBy: admin.id },
+      data: { ...validRequest, updatedBy: user.id },
     });
 
     return toBankAccountResponse(result);
@@ -80,5 +80,34 @@ export class BankAccountService {
     return data.map(
       (item: BankAccount): BankAccountResponse => toBankAccountResponse(item),
     );
+  }
+
+  static async delete(user: User, id: number): Promise<boolean> {
+    const existingData = await dbClient.bankAccount.findFirst({
+      where: { id },
+    });
+
+    if (!existingData) {
+      throw new BadRequest('Bank account does not exist');
+    }
+
+    const transactionCount = await dbClient.transaction.count({
+      where: {
+        bankAccountId: id,
+      },
+    });
+
+    if (transactionCount > 0) {
+      throw new BadRequest(
+        'Cannot delete bank account because it has associated transactions',
+      );
+    }
+
+    // Hard delete
+    await dbClient.bankAccount.delete({
+      where: { id },
+    });
+
+    return true;
   }
 }

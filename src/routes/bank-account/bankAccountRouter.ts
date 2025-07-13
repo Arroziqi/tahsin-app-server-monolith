@@ -9,3 +9,7 @@ bankAccountRouter.patch(
 );
 bankAccountRouter.get('/api/bankAccount/get/:id', BankAccountController.get);
 bankAccountRouter.get('/api/bankAccount/getAll', BankAccountController.getAll);
+bankAccountRouter.delete(
+  '/api/bankAccount/delete/:id',
+  BankAccountController.delete,
+);
