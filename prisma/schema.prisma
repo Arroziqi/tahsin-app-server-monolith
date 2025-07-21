@@ -465,8 +465,9 @@ model Event {
   updatedAt DateTime? @updatedAt @map("updated_at")
   updatedBy Int?      @map("updated_by")
 
-  Schedule    Schedule[]
-  Transaction Transaction[]
+  Schedule         Schedule[]
+  Transaction      Transaction[]
+  AcademicCalendar AcademicCalendar[]
 
   @@map("event")
 }
@@ -484,7 +485,25 @@ model AcademicPeriod {
   updatedBy   Int?      @map("updated_by")
 
   // Relations
-  Schedules Schedule[]
+  Schedules        Schedule[]
+  AcademicCalendar AcademicCalendar[]
 
   @@map("academic_period")
+}
+
+model AcademicCalendar {
+  id               Int            @id @default(autoincrement())
+  academicPeriodId Int            @map("academic_period_id")
+  eventId          Int            @map("event_id")
+  startDate        DateTime
+  endDate          DateTime
+  isActive         Boolean        @default(true)
+  createdAt        DateTime?      @default(now()) @map("created_at")
+  createdBy        Int?           @map("created_by")
+  updatedAt        DateTime?      @updatedAt @map("updated_at")
+  updatedBy        Int?           @map("updated_by")
+  Event            Event          @relation(fields: [eventId], references: [id])
+  AcademicPeriod   AcademicPeriod @relation(fields: [academicPeriodId], references: [id])
+
+  @@map("academic_calendar")
 }

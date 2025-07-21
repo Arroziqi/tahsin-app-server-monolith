@@ -25,6 +25,7 @@ import { enrollmentRouter } from './enrollment/enrollmentRouter';
 import { announcementRouter } from './announcement/announcementRouter';
 import { eventRouter } from './event/eventRouter';
 import { academicPeriodRouter } from './academicPeriod/academicPeriodRouter';
+import { academicCalendarRouter } from './academicCalendar/academicCalendarRouter';
 
 export const superRouter: Router = express.Router();
 superRouter.use(userRouter);
@@ -53,3 +54,4 @@ superRouter.use(adminRouter);
 superRouter.use(announcementRouter);
 superRouter.use(eventRouter);
 superRouter.use(academicPeriodRouter);
+superRouter.use(academicCalendarRouter);
