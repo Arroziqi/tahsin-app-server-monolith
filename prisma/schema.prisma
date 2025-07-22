@@ -487,6 +487,7 @@ model AcademicPeriod {
   // Relations
   Schedules        Schedule[]
   AcademicCalendar AcademicCalendar[]
+  PaymentFee       PaymentFee[]
 
   @@map("academic_period")
 }
@@ -506,4 +507,22 @@ model AcademicCalendar {
   AcademicPeriod   AcademicPeriod @relation(fields: [academicPeriodId], references: [id])
 
   @@map("academic_calendar")
+}
+
+model PaymentFee {
+  id               Int            @id @default(autoincrement())
+  academicPeriodId Int            @map("academic_period_id")
+  feeType          String
+  amount           Decimal
+  description      String?
+  dueDate          DateTime       @map("due_date")
+  isInvoiced       Boolean        @default(false) @map("is_invoiced")
+  createdAt        DateTime?      @default(now()) @map("created_at")
+  createdBy        Int?           @map("created_by")
+  updatedAt        DateTime?      @updatedAt @map("updated_at")
+  updatedBy        Int?           @map("updated_by")
+  AcademicPeriod   AcademicPeriod @relation(fields: [academicPeriodId], references: [id])
+
+  @@unique([academicPeriodId, feeType])
+  @@map("payment_fee")
 }

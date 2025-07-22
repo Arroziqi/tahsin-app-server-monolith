@@ -19,7 +19,7 @@ export class AcademicCalendarService {
       req,
     );
 
-    // Verify academic period exists
+    // Verify academic period exists and is active
     const academicPeriod = await dbClient.academicPeriod.findUnique({
       where: { id: validRequest.academicPeriodId },
     });
@@ -27,14 +27,32 @@ export class AcademicCalendarService {
     if (!academicPeriod) {
       throw new BadRequest('Periode akademik tidak ditemukan');
     }
+    if (!academicPeriod.isActive) {
+      throw new BadRequest('Periode akademik tidak aktif');
+    }
 
-    // Verify event exists
+    // Verify event exists and is active
     const event = await dbClient.event.findUnique({
       where: { id: validRequest.eventId },
     });
 
     if (!event) {
       throw new BadRequest('Event tidak ditemukan');
+    }
+    if (!event.isActive) {
+      throw new BadRequest('Event tidak aktif');
+    }
+
+    // Check for existing calendar with same period and event
+    const existingCalendar = await dbClient.academicCalendar.findFirst({
+      where: {
+        academicPeriodId: validRequest.academicPeriodId,
+        eventId: validRequest.eventId,
+      },
+    });
+
+    if (existingCalendar) {
+      throw new BadRequest('Event sudah ada untuk periode akademik ini');
     }
 
     // Verify dates are within academic period
@@ -49,6 +67,10 @@ export class AcademicCalendarService {
       data: {
         ...validRequest,
         createdBy: admin.id,
+      },
+      include: {
+        AcademicPeriod: true,
+        Event: true,
       },
     });
 
@@ -68,6 +90,7 @@ export class AcademicCalendarService {
       where: { id: validRequest.id },
       include: {
         AcademicPeriod: true,
+        Event: true,
       },
     });
 
@@ -90,17 +113,47 @@ export class AcademicCalendarService {
       if (!newAcademicPeriod) {
         throw new BadRequest('Periode akademik tidak ditemukan');
       }
+      if (!newAcademicPeriod.isActive) {
+        throw new BadRequest('Periode akademik tidak aktif');
+      }
       academicPeriod = newAcademicPeriod;
+    } else if (!academicPeriod.isActive) {
+      throw new BadRequest('Periode akademik terkait tidak aktif');
     }
 
     // Verify event if changing
+    let event = existingCalendar.Event;
     if (validRequest.eventId) {
-      const event = await dbClient.event.findUnique({
+      const newEvent = await dbClient.event.findUnique({
         where: { id: validRequest.eventId },
       });
 
-      if (!event) {
+      if (!newEvent) {
         throw new BadRequest('Event tidak ditemukan');
+      }
+      if (!newEvent.isActive) {
+        throw new BadRequest('Event tidak aktif');
+      }
+      event = newEvent;
+    } else if (!event.isActive) {
+      throw new BadRequest('Event terkait tidak aktif');
+    }
+
+    // Check for duplicate only if period or event is being changed
+    if (validRequest.academicPeriodId || validRequest.eventId) {
+      const duplicateCalendar = await dbClient.academicCalendar.findFirst({
+        where: {
+          academicPeriodId:
+            validRequest.academicPeriodId || existingCalendar.academicPeriodId,
+          eventId: validRequest.eventId || existingCalendar.eventId,
+          NOT: {
+            id: existingCalendar.id, // Exclude current calendar from check
+          },
+        },
+      });
+
+      if (duplicateCalendar) {
+        throw new BadRequest('Event sudah ada untuk periode akademik ini');
       }
     }
 
@@ -120,6 +173,10 @@ export class AcademicCalendarService {
       data: {
         ...validRequest,
         updatedBy: admin.id,
+      },
+      include: {
+        AcademicPeriod: true,
+        Event: true,
       },
     });
 
@@ -150,6 +207,10 @@ export class AcademicCalendarService {
   static async get(id: number): Promise<AcademicCalendarResponse> {
     const calendar = await dbClient.academicCalendar.findUnique({
       where: { id },
+      include: {
+        AcademicPeriod: true,
+        Event: true,
+      },
     });
 
     if (!calendar) {
@@ -162,6 +223,10 @@ export class AcademicCalendarService {
   static async getAll(): Promise<AcademicCalendarResponse[]> {
     const calendars = await dbClient.academicCalendar.findMany({
       orderBy: { startDate: 'asc' },
+      include: {
+        AcademicPeriod: true,
+        Event: true,
+      },
     });
 
     return calendars.map(toAcademicCalendarResponse);
