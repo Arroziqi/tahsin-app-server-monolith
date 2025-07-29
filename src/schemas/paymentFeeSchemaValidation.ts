@@ -3,7 +3,7 @@ import { z } from 'zod';
 export const PaymentFeeSchemaValidation = {
   CREATE: z.object({
     academicPeriodId: z.number().min(1, 'Periode akademik harus dipilih'),
-    feeType: z.enum(['full_tuition_fee', 'down_payment', 'final_installment'], {
+    feeType: z.enum(['full_tuition', 'down_payment', 'final_installment'], {
       errorMap: () => ({ message: 'Jenis biaya tidak valid' }),
     }),
     amount: z.number().positive('Nominal harus lebih dari 0'),
@@ -12,13 +12,15 @@ export const PaymentFeeSchemaValidation = {
   }),
   UPDATE: z.object({
     id: z.number(),
+    academicPeriodId: z.number().optional(),
     feeType: z
-      .enum(['full_tuition_fee', 'down_payment', 'final_installment'])
+      .enum(['full_tuition', 'down_payment', 'final_installment'])
       .optional(),
     amount: z.number().positive('Nominal harus lebih dari 0').optional(),
     description: z.string().optional(),
     dueDate: z
       .union([z.date(), z.string().transform((val) => new Date(val))])
       .optional(),
+    isInvoiced: z.boolean().optional(),
   }),
 };

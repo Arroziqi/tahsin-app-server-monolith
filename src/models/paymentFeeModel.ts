@@ -28,6 +28,7 @@ export type CreatePaymentFeeRequest = {
 
 export type UpdatePaymentFeeRequest = {
   id: number;
+  academicPeriodId?: number;
   feeType?: string;
   amount?: number;
   description?: string;
