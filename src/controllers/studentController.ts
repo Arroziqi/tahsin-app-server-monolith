@@ -1,22 +1,22 @@
 import { NextFunction, Response } from 'express';
-import { AdminRequest } from '../type/adminRequest';
 import { StudentService } from '../services/studentService';
 import {
   CreateStudentRequest,
   StudentResponse,
   UpdateStudentRequest,
 } from '../models/studentModel';
+import { UserRequest } from '../type/userRequest';
 
 export class StudentController {
   static async create(
-    req: AdminRequest,
+    req: UserRequest,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
     try {
       const request: CreateStudentRequest = req.body as CreateStudentRequest;
       const response: StudentResponse = await StudentService.create(
-        req.admin!,
+        req.user!,
         request,
       );
       res.status(200).json({ data: response });
@@ -26,14 +26,14 @@ export class StudentController {
   }
 
   static async update(
-    req: AdminRequest,
+    req: UserRequest,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
     try {
       const request: UpdateStudentRequest = req.body as UpdateStudentRequest;
       const response: StudentResponse = await StudentService.update(
-        req.admin!,
+        req.user!,
         request,
       );
       res.status(200).json({ data: response });
@@ -43,7 +43,7 @@ export class StudentController {
   }
 
   static async get(
-    req: AdminRequest,
+    req: UserRequest,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -57,7 +57,7 @@ export class StudentController {
   }
 
   static async getAll(
-    req: AdminRequest,
+    req: UserRequest,
     res: Response,
     next: NextFunction,
   ): Promise<void> {

@@ -3,6 +3,8 @@ import { ClassType, Education, Program, TimeOfStudy } from '@prisma/client';
 
 export class EnrollmentSchemaValidation {
   static readonly CREATE: ZodType = z.object({
+    username: z.string(),
+    email: z.string(),
     fullName: z.string(),
     dateOfBirth: z.preprocess((val) => {
       if (typeof val === 'string' || val instanceof Date) {
@@ -11,7 +13,6 @@ export class EnrollmentSchemaValidation {
       return val;
     }, z.date()),
     noTelp: z.string(),
-    email: z.string(),
     lastEducation: z.nativeEnum(Education),
     program: z.nativeEnum(Program),
     classType: z.nativeEnum(ClassType),
@@ -27,8 +28,9 @@ export class EnrollmentSchemaValidation {
         return undefined;
       }, z.date())
       .optional(),
-    userId: z.number(),
-    classId: z.number(),
+    academicPeriodId: z.number(),
+    userId: z.number().optional(),
+    classId: z.number().optional(),
   });
   static readonly UPDATE: ZodType = z.object({
     id: z.number(),

@@ -49,28 +49,38 @@ model Admin {
   @@map("admin")
 }
 
-model Student {
-  id              Int       @id @default(autoincrement())
-  fullName        String    @map("full_name")
-  motivation      String
-  userId          Int       @unique @map("user_id")
-  levelId         Int?      @map("level_id")
-  classId         Int       @map("class_id")
-  enrollmentId    Int       @map("enrollment_id")
-  studentStatusId Int?      @map("student_status_id")
-  createdAt       DateTime? @default(now()) @map("created_at")
-  createdBy       Int?      @map("created_by")
-  updatedAt       DateTime? @updatedAt @map("updated_at")
-  updatedBy       Int?      @map("updated_by")
+enum StudentStatusEnum {
+  ACTIVE
+  INACTIVE
+  DROP_OUT
+  GRADUATED
+  ON_LEAVE
+}
 
-  User          User           @relation(fields: [userId], references: [id])
-  Level         Level?         @relation(fields: [levelId], references: [id])
-  Class         Class          @relation(fields: [classId], references: [id])
-  Enrollment    Enrollment     @relation(fields: [enrollmentId], references: [id])
-  StudentStatus StudentStatus? @relation(fields: [studentStatusId], references: [id])
-  Scores        Score[]
-  Attendances   Attendance[]
-  Bills         Bill[]
+model Student {
+  id            Int                @id @default(autoincrement())
+  fullName      String             @map("full_name")
+  dateOfBirth   DateTime?          @map("date_of_birth")
+  noTelp        String?            @map("no_telp")
+  lastEducation Education?         @map("last_education")
+  motivation    String
+  userId        Int                @unique @map("user_id")
+  levelId       Int?               @map("level_id")
+  classId       Int?               @map("class_id")
+  enrollmentId  Int                @map("enrollment_id")
+  studentStatus StudentStatusEnum? @default(INACTIVE) @map("student_status")
+  createdAt     DateTime?          @default(now()) @map("created_at")
+  createdBy     Int?               @map("created_by")
+  updatedAt     DateTime?          @updatedAt @map("updated_at")
+  updatedBy     Int?               @map("updated_by")
+
+  User        User         @relation(fields: [userId], references: [id])
+  Level       Level?       @relation(fields: [levelId], references: [id])
+  Class       Class?       @relation(fields: [classId], references: [id])
+  Enrollment  Enrollment   @relation(fields: [enrollmentId], references: [id])
+  Scores      Score[]
+  Attendances Attendance[]
+  Bills       Bill[]
 
   @@map("student")
 }
@@ -176,18 +186,18 @@ model TransactionType {
   @@map("transaction_type")
 }
 
-model StudentStatus {
-  id        Int       @id @default(autoincrement())
-  status    String    @unique
-  createdAt DateTime? @default(now()) @map("created_at")
-  createdBy Int?      @map("created_by")
-  updatedAt DateTime? @updatedAt @map("updated_at")
-  updatedBy Int?      @map("updated_by")
-
-  Students Student[]
-
-  @@map("student_status")
-}
+// model StudentStatus {
+//   id        Int       @id @default(autoincrement())
+//   status    String    @unique
+//   createdAt DateTime? @default(now()) @map("created_at")
+//   createdBy Int?      @map("created_by")
+//   updatedAt DateTime? @updatedAt @map("updated_at")
+//   updatedBy Int?      @map("updated_by")
+//
+//   Students Student[]
+//
+//   @@map("student_status")
+// }
 
 model TransactionStatus {
   id        Int       @id @default(autoincrement())
@@ -430,16 +440,18 @@ model Enrollment {
   motivation        String
   voiceRecording    String?     @map("voice_recording")
   dateOfReservation DateTime?   @map("date_of_reservation")
+  academicPeriodId  Int         @map("academic_period_id")
   userId            Int         @map("user_id")
-  classId           Int         @map("class_id")
+  classId           Int?        @map("class_id")
   createdAt         DateTime?   @default(now()) @map("created_at")
   createdBy         Int?        @map("created_by")
   updatedAt         DateTime?   @updatedAt @map("updated_at")
   updatedBy         Int?        @map("updated_by")
 
-  User     User?     @relation(fields: [userId], references: [id])
-  Class    Class?    @relation(fields: [classId], references: [id])
-  Students Student[]
+  AcademicPeriod AcademicPeriod? @relation(fields: [academicPeriodId], references: [id])
+  User           User?           @relation(fields: [userId], references: [id])
+  Class          Class?          @relation(fields: [classId], references: [id])
+  Students       Student[]
 
   @@map("enrollment")
 }
@@ -488,6 +500,7 @@ model AcademicPeriod {
   Schedules        Schedule[]
   AcademicCalendar AcademicCalendar[]
   PaymentFee       PaymentFee[]
+  Enrollment       Enrollment[]
 
   @@map("academic_period")
 }

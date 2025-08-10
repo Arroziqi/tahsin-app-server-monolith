@@ -1,18 +1,23 @@
 import { Validation } from '../common/type/validation';
 import { dbClient } from '../common/provider/database';
 import { BadRequest } from '../exceptions/error/badRequest';
-import { Admin, Enrollment, User } from '@prisma/client';
+import { Enrollment, User } from '@prisma/client';
 import {
   CreateEnrollmentRequest,
   EnrollmentResponse,
+  RegisterEnrollmentRequest,
   toEnrollmentResponse,
   UpdateEnrollmentRequest,
 } from '../models/enrollmentModel';
 import { EnrollmentSchemaValidation } from '../schemas/enrollmentSchemaValidation';
+import { DEFAULT_PW_USER } from '../secret';
+import { UserResponse } from '../models/userModel';
+import { UserService } from './userService';
+import { StudentService } from './studentService';
 
 export class EnrollmentService {
   static async create(
-    admin: Admin,
+    user: User,
     req: CreateEnrollmentRequest,
   ): Promise<EnrollmentResponse> {
     const validRequest: CreateEnrollmentRequest = Validation.validate(
@@ -20,30 +25,61 @@ export class EnrollmentService {
       req,
     );
 
-    const totalEnrollmentWithSameEnrollment: number =
-      await dbClient.enrollment.count({
-        where: {
-          userId: validRequest.userId,
-          classId: validRequest.classId,
-        },
-      });
+    let userId: number;
 
-    if (totalEnrollmentWithSameEnrollment !== 0) {
+    if (!validRequest.userId) {
+      // Buat user baru
+      const newUser: UserResponse = await UserService.create(user, {
+        ...req,
+        password: DEFAULT_PW_USER,
+      });
+      userId = newUser.id;
+    } else {
+      // Sudah ada user
+      userId = validRequest.userId;
+    }
+
+    // Cek duplikat enrollment
+    const totalEnrollmentWithSame = await dbClient.enrollment.count({
+      where: {
+        userId: userId,
+        // classId: validRequest.classId!,
+      },
+    });
+
+    if (totalEnrollmentWithSame > 0) {
       throw new BadRequest('duplicate enrollment');
     }
 
-    const data = await dbClient.enrollment.create({
-      data: { ...validRequest, createdBy: admin.id },
+    // Buat enrollment baru
+    const { username, ...enrollmentReq } = validRequest;
+    const enrollment = await dbClient.enrollment.create({
+      data: { ...enrollmentReq, userId, createdBy: user.id },
     });
 
-    return toEnrollmentResponse(data);
+    if (validRequest.userId) {
+      // CASE: student sudah terdaftar → update student
+      await dbClient.student.update({
+        where: { userId },
+        data: { enrollmentId: enrollment.id },
+      });
+    } else {
+      await StudentService.create(user, {
+        ...req,
+        userId,
+        enrollmentId: enrollment.id,
+      });
+    }
+
+    return toEnrollmentResponse(enrollment);
   }
 
+  // TODO: this function is not satisfied with the requirement
   static async register(
     user: User,
     req: CreateEnrollmentRequest,
   ): Promise<EnrollmentResponse> {
-    const validRequest: CreateEnrollmentRequest = Validation.validate(
+    const validRequest: RegisterEnrollmentRequest = Validation.validate(
       EnrollmentSchemaValidation.CREATE,
       { ...req, userId: user.id },
     );
@@ -68,7 +104,7 @@ export class EnrollmentService {
   }
 
   static async update(
-    admin: Admin,
+    user: User,
     req: UpdateEnrollmentRequest,
   ): Promise<EnrollmentResponse> {
     const validRequest: UpdateEnrollmentRequest = Validation.validate(
@@ -108,7 +144,7 @@ export class EnrollmentService {
       where: {
         id: validRequest.id,
       },
-      data: { ...validRequest, updatedBy: admin.id },
+      data: { ...validRequest, updatedBy: user.id },
     });
 
     return toEnrollmentResponse(result);

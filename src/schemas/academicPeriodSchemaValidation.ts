@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 // Helper function untuk transform string ke Date
-const stringToDate = (val: unknown): Date => {
+export const stringToDate = (val: unknown): Date => {
   if (val instanceof Date) return val;
   if (typeof val === 'string' || typeof val === 'number') {
     const date = new Date(val);

@@ -5,6 +5,7 @@ import {
   PrismaClient,
   Program,
   Role,
+  StudentStatusEnum,
   TimeOfStudy,
 } from '@prisma/client';
 import { hashPassword } from '../src/common/provider/hash';
@@ -129,14 +130,14 @@ async function main() {
   ]);
 
   // Student Status
-  const studentStatus = await prisma.studentStatus.create({
-    data: {
-      status: 'Aktif',
-      createdAt: now,
-      updatedAt: now,
-      updatedBy: superAdmin.id,
-    },
-  });
+  // const studentStatus = await prisma.studentStatus.create({
+  //   data: {
+  //     status: 'Aktif',
+  //     createdAt: now,
+  //     updatedAt: now,
+  //     updatedBy: superAdmin.id,
+  //   },
+  // });
 
   // Batch
   const batch = await prisma.batch.create({
@@ -171,6 +172,18 @@ async function main() {
     },
   });
 
+  // Academic Period
+  const academicPeriod = await prisma.academicPeriod.create({
+    data: {
+      name: 'Periode 2025/2026',
+      startDate: now,
+      endDate: new Date(now.getFullYear() + 1, now.getMonth(), now.getDate()), // 1 tahun setelah now
+      createdAt: now,
+      updatedAt: now,
+      updatedBy: superAdmin.id,
+    },
+  });
+
   // Enrollment
   const enrollment = await prisma.enrollment.create({
     data: {
@@ -184,6 +197,7 @@ async function main() {
       timeOfStudy: TimeOfStudy.MORNING,
       motivation: 'belajar',
       voiceRecording: 'voice',
+      academicPeriodId: academicPeriod.id, // pakai id hasil create
       userId: studentUser.id,
       classId: kelas.id,
       createdAt: now,
@@ -201,7 +215,7 @@ async function main() {
       levelId: levelDasar.id,
       classId: kelas.id,
       enrollmentId: enrollment.id,
-      studentStatusId: studentStatus.id,
+      studentStatus: StudentStatusEnum.ACTIVE,
       createdAt: now,
       updatedAt: now,
       updatedBy: superAdmin.id,

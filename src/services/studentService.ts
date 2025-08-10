@@ -1,7 +1,7 @@
 import { Validation } from '../common/type/validation';
 import { dbClient } from '../common/provider/database';
 import { BadRequest } from '../exceptions/error/badRequest';
-import { Admin, Student } from '@prisma/client';
+import { Student, User } from '@prisma/client';
 import {
   CreateStudentRequest,
   StudentResponse,
@@ -12,7 +12,7 @@ import { StudentSchemaValidation } from '../schemas/studentSchemaValidation';
 
 export class StudentService {
   static async create(
-    admin: Admin,
+    user: User,
     req: CreateStudentRequest,
   ): Promise<StudentResponse> {
     const validRequest: CreateStudentRequest = Validation.validate(
@@ -29,14 +29,17 @@ export class StudentService {
     }
 
     const data = await dbClient.student.create({
-      data: { ...validRequest, createdBy: admin.id },
+      data: { ...validRequest, createdBy: user.id },
+      include: {
+        User: true,
+      },
     });
 
     return toStudentResponse(data);
   }
 
   static async update(
-    admin: Admin,
+    user: User,
     req: UpdateStudentRequest,
   ): Promise<StudentResponse> {
     const validRequest: UpdateStudentRequest = Validation.validate(
@@ -54,7 +57,10 @@ export class StudentService {
       where: {
         id: validRequest.id,
       },
-      data: { ...validRequest, updatedBy: admin.id },
+      data: { ...validRequest, updatedBy: user.id },
+      include: {
+        User: true,
+      },
     });
 
     return toStudentResponse(result);
@@ -63,15 +69,20 @@ export class StudentService {
   static async get(id: number): Promise<StudentResponse> {
     const data = await dbClient.student.findFirst({
       where: { id },
+      include: {
+        User: true,
+      },
     });
     return toStudentResponse(data!);
   }
 
   static async getAll(): Promise<StudentResponse[]> {
-    const data: Student[] = await dbClient.student.findMany();
+    const data: (Student & { User: User })[] = await dbClient.student.findMany({
+      include: {
+        User: true,
+      },
+    });
 
-    return data.map(
-      (item: Student): StudentResponse => toStudentResponse(item),
-    );
+    return data.map((item) => toStudentResponse(item));
   }
 }

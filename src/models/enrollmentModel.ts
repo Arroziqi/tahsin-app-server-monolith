@@ -8,53 +8,76 @@ import {
 
 export type EnrollmentResponse = {
   id: number;
+  email: string;
   fullName: string;
+  motivation: string;
   dateOfBirth: Date;
   noTelp: string;
-  email: string;
   lastEducation: Education;
   program: Program;
   classType: ClassType;
   timeOfStudy: TimeOfStudy;
-  motivation: string;
   voiceRecording?: string;
   dateOfReservation?: Date;
-  userId: number;
-  classId: number;
+  academicPeriodId: number;
+  userId?: number;
+  classId?: number | null;
   createdBy: number | null;
 };
 
 export type CreateEnrollmentRequest = {
+  username: string;
+  email: string;
   fullName: string;
+  motivation: string;
   dateOfBirth: Date;
   noTelp: string;
-  email: string;
   lastEducation: Education;
   program: Program;
   classType: ClassType;
   timeOfStudy: TimeOfStudy;
-  motivation: string;
   voiceRecording?: string;
   dateOfReservation?: Date;
+  academicPeriodId: number;
+  userId?: number;
+  classId?: number | null;
+};
+
+export type RegisterEnrollmentRequest = {
+  username: string;
+  email: string;
+  fullName: string;
+  motivation: string;
+  dateOfBirth: Date;
+  noTelp: string;
+  lastEducation: Education;
+  program: Program;
+  classType: ClassType;
+  timeOfStudy: TimeOfStudy;
+  voiceRecording?: string;
+  dateOfReservation?: Date;
+  academicPeriodId: number;
   userId: number;
-  classId: number;
+  classId?: number | null;
 };
 
 export type UpdateEnrollmentRequest = {
   id: number;
-  fullName?: string;
-  dateOfBirth?: Date;
-  noTelp?: string;
-  email?: string;
-  lastEducation?: Education;
-  program?: Program;
-  classType?: ClassType;
-  timeOfStudy?: TimeOfStudy;
-  motivation?: string;
+  username: string;
+  email: string;
+  fullName: string;
+  motivation: string;
+  dateOfBirth: Date;
+  noTelp: string;
+  lastEducation: Education;
+  program: Program;
+  classType: ClassType;
+  timeOfStudy: TimeOfStudy;
   voiceRecording?: string;
   dateOfReservation?: Date;
+  academicPeriodId: number;
   userId?: number;
-  classId?: number;
+  classId?: number | null;
 };
 
 export function toEnrollmentResponse(
@@ -62,6 +85,7 @@ export function toEnrollmentResponse(
 ): EnrollmentResponse {
   return {
     id: enrollment.id,
+    academicPeriodId: enrollment.academicPeriodId,
     userId: enrollment.userId,
     classId: enrollment.classId,
     createdBy: enrollment.createdBy,

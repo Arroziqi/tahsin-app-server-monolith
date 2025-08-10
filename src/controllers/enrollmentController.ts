@@ -1,5 +1,4 @@
 import { NextFunction, Response } from 'express';
-import { AdminRequest } from '../type/adminRequest';
 import { EnrollmentService } from '../services/enrollmentService';
 import {
   CreateEnrollmentRequest,
@@ -10,7 +9,7 @@ import { UserRequest } from '../type/userRequest';
 
 export class EnrollmentController {
   static async create(
-    req: AdminRequest,
+    req: UserRequest,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -18,7 +17,7 @@ export class EnrollmentController {
       const request: CreateEnrollmentRequest =
         req.body as CreateEnrollmentRequest;
       const response: EnrollmentResponse = await EnrollmentService.create(
-        req.admin!,
+        req.user!,
         request,
       );
       res.status(200).json({ data: response });
@@ -46,7 +45,7 @@ export class EnrollmentController {
   }
 
   static async update(
-    req: AdminRequest,
+    req: UserRequest,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -54,7 +53,7 @@ export class EnrollmentController {
       const request: UpdateEnrollmentRequest =
         req.body as UpdateEnrollmentRequest;
       const response: EnrollmentResponse = await EnrollmentService.update(
-        req.admin!,
+        req.user!,
         request,
       );
       res.status(200).json({ data: response });
@@ -64,7 +63,7 @@ export class EnrollmentController {
   }
 
   static async get(
-    req: AdminRequest,
+    req: UserRequest,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -78,7 +77,7 @@ export class EnrollmentController {
   }
 
   static async getAll(
-    req: AdminRequest,
+    req: UserRequest,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
