@@ -1,7 +1,7 @@
 import { Validation } from '../common/type/validation';
 import { dbClient } from '../common/provider/database';
 import { BadRequest } from '../exceptions/error/badRequest';
-import { Enrollment, User } from '@prisma/client';
+import { Enrollment, FeeType, User } from '@prisma/client';
 import {
   CreateEnrollmentRequest,
   EnrollmentResponse,
@@ -14,6 +14,10 @@ import { DEFAULT_PW_USER } from '../secret';
 import { UserResponse } from '../models/userModel';
 import { UserService } from './userService';
 import { StudentService } from './studentService';
+import { PaymentFeeService } from './paymentFeeService';
+import { PaymentFeeResponse } from '../models/paymentFeeModel';
+import { BillService } from './billService';
+import { StudentResponse } from '../models/studentModel';
 
 export class EnrollmentService {
   static async create(
@@ -57,19 +61,35 @@ export class EnrollmentService {
       data: { ...enrollmentReq, userId, createdBy: user.id },
     });
 
-    if (validRequest.userId) {
+    let student: StudentResponse;
+
+    if (validRequest.studentId) {
       // CASE: student sudah terdaftar → update student
-      await dbClient.student.update({
-        where: { userId },
-        data: { enrollmentId: enrollment.id },
+      student = await StudentService.update(user, {
+        ...req,
+        id: validRequest.studentId,
+        enrollmentId: enrollment.id,
       });
     } else {
-      await StudentService.create(user, {
+      student = await StudentService.create(user, {
         ...req,
         userId,
         enrollmentId: enrollment.id,
       });
     }
+
+    // buat bill
+    const paymentFeeResponse: PaymentFeeResponse =
+      await PaymentFeeService.getByAcademicPeriod(
+        enrollmentReq.academicPeriodId,
+        FeeType.DOWN_PAYMENT,
+      );
+
+    await BillService.create(user, {
+      bill: paymentFeeResponse.amount,
+      remainBill: paymentFeeResponse.amount,
+      studentId: student.id,
+    });
 
     return toEnrollmentResponse(enrollment);
   }

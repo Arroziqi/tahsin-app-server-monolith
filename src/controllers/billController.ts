@@ -1,22 +1,22 @@
 import { NextFunction, Response } from 'express';
-import { AdminRequest } from '../type/adminRequest';
 import {
   BillResponse,
   CreateBillRequest,
   UpdateBillRequest,
 } from '../models/billModel';
 import { BillService } from '../services/billService';
+import { UserRequest } from '../type/userRequest';
 
 export class BillController {
   static async create(
-    req: AdminRequest,
+    req: UserRequest,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
     try {
       const request: CreateBillRequest = req.body as CreateBillRequest;
       const response: BillResponse = await BillService.create(
-        req.admin!,
+        req.user!,
         request,
       );
       res.status(200).json({ data: response });
@@ -26,14 +26,14 @@ export class BillController {
   }
 
   static async update(
-    req: AdminRequest,
+    req: UserRequest,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
     try {
       const request: UpdateBillRequest = req.body as UpdateBillRequest;
       const response: BillResponse = await BillService.update(
-        req.admin!,
+        req.user!,
         request,
       );
       res.status(200).json({ data: response });
@@ -43,7 +43,7 @@ export class BillController {
   }
 
   static async get(
-    req: AdminRequest,
+    req: UserRequest,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -57,7 +57,7 @@ export class BillController {
   }
 
   static async getAll(
-    req: AdminRequest,
+    req: UserRequest,
     res: Response,
     next: NextFunction,
   ): Promise<void> {

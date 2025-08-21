@@ -38,6 +38,7 @@ export type UpdateStudentRequest = {
   lastEducation?: Education | null;
   levelId?: number | null;
   classId?: number | null;
+  enrollmentId?: number;
   studentStatus?: StudentStatusEnum | null;
 };
 

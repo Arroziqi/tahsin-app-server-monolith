@@ -1,7 +1,7 @@
 import { Validation } from '../common/type/validation';
 import { dbClient } from '../common/provider/database';
 import { BadRequest } from '../exceptions/error/badRequest';
-import { Admin, Bill } from '@prisma/client';
+import { Bill, User } from '@prisma/client';
 import {
   BillResponse,
   CreateBillRequest,
@@ -12,7 +12,7 @@ import { BillSchemaValidation } from '../schemas/billSchemaValidation';
 
 export class BillService {
   static async create(
-    admin: Admin,
+    user: User,
     req: CreateBillRequest,
   ): Promise<BillResponse> {
     const validRequest: CreateBillRequest = Validation.validate(
@@ -34,14 +34,14 @@ export class BillService {
     }
 
     const data = await dbClient.bill.create({
-      data: { ...validRequest, createdBy: admin.id },
+      data: { ...validRequest, createdBy: user.id },
     });
 
     return toBillResponse(data);
   }
 
   static async update(
-    admin: Admin,
+    user: User,
     req: UpdateBillRequest,
   ): Promise<BillResponse> {
     const validRequest: UpdateBillRequest = Validation.validate(
@@ -83,7 +83,7 @@ export class BillService {
       where: {
         id: validRequest.id,
       },
-      data: { ...validRequest, updatedBy: admin.id },
+      data: { ...validRequest, updatedBy: user.id },
     });
 
     return toBillResponse(result);
@@ -92,6 +92,13 @@ export class BillService {
   static async get(id: number): Promise<BillResponse> {
     const data = await dbClient.bill.findFirst({
       where: { id },
+    });
+    return toBillResponse(data!);
+  }
+
+  static async getByStudentId(studentId: number): Promise<BillResponse> {
+    const data = await dbClient.bill.findFirst({
+      where: { studentId },
     });
     return toBillResponse(data!);
   }

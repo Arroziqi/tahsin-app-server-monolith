@@ -8,6 +8,7 @@ import {
 } from '../models/paymentFeeModel';
 import { PaymentFeeSchemaValidation } from '../schemas/paymentFeeSchemaValidation';
 import { BadRequest } from '../exceptions/error/badRequest';
+import { FeeType } from '@prisma/client';
 
 export class PaymentFeeService {
   static async create(
@@ -98,6 +99,20 @@ export class PaymentFeeService {
   static async get(id: number): Promise<PaymentFeeResponse> {
     const fee = await dbClient.paymentFee.findUnique({
       where: { id },
+      include: { AcademicPeriod: true },
+    });
+
+    if (!fee) throw new BadRequest('Biaya tidak ditemukan');
+
+    return toPaymentFeeResponse(fee);
+  }
+
+  static async getByAcademicPeriod(
+    academicPeriodId: number,
+    feeType: FeeType,
+  ): Promise<PaymentFeeResponse> {
+    const fee = await dbClient.paymentFee.findFirst({
+      where: { academicPeriodId, feeType },
       include: { AcademicPeriod: true },
     });
 

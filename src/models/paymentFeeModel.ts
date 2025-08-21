@@ -1,10 +1,10 @@
-import { AcademicPeriod, PaymentFee } from '@prisma/client';
+import { AcademicPeriod, FeeType, PaymentFee } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 
 export type PaymentFeeResponse = {
   id: number;
   academicPeriodId: number;
-  feeType: string;
+  feeType: FeeType;
   amount: number;
   description?: string | null;
   dueDate: Date;
@@ -20,7 +20,7 @@ export type PaymentFeeResponse = {
 
 export type CreatePaymentFeeRequest = {
   academicPeriodId: number;
-  feeType: string;
+  feeType: FeeType;
   amount: number;
   description?: string;
   dueDate: Date;
@@ -29,7 +29,7 @@ export type CreatePaymentFeeRequest = {
 export type UpdatePaymentFeeRequest = {
   id: number;
   academicPeriodId?: number;
-  feeType?: string;
+  feeType?: FeeType;
   amount?: number;
   description?: string;
   dueDate?: Date;

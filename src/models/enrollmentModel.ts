@@ -40,6 +40,7 @@ export type CreateEnrollmentRequest = {
   dateOfReservation?: Date;
   academicPeriodId: number;
   userId?: number;
+  studentId?: number; // only for detecting is the student already registered or not
   classId?: number | null;
 };
 

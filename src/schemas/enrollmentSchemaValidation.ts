@@ -30,6 +30,7 @@ export class EnrollmentSchemaValidation {
       .optional(),
     academicPeriodId: z.number(),
     userId: z.number().optional(),
+    studentId: z.number().optional(),
     classId: z.number().optional(),
   });
   static readonly UPDATE: ZodType = z.object({

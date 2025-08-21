@@ -1,9 +1,10 @@
 import { z } from 'zod';
+import { FeeType } from '@prisma/client';
 
 export const PaymentFeeSchemaValidation = {
   CREATE: z.object({
     academicPeriodId: z.number().min(1, 'Periode akademik harus dipilih'),
-    feeType: z.enum(['full_tuition', 'down_payment', 'final_installment'], {
+    feeType: z.nativeEnum(FeeType, {
       errorMap: () => ({ message: 'Jenis biaya tidak valid' }),
     }),
     amount: z.number().positive('Nominal harus lebih dari 0'),
@@ -13,9 +14,7 @@ export const PaymentFeeSchemaValidation = {
   UPDATE: z.object({
     id: z.number(),
     academicPeriodId: z.number().optional(),
-    feeType: z
-      .enum(['full_tuition', 'down_payment', 'final_installment'])
-      .optional(),
+    feeType: z.nativeEnum(FeeType).optional(),
     amount: z.number().positive('Nominal harus lebih dari 0').optional(),
     description: z.string().optional(),
     dueDate: z

@@ -2,7 +2,7 @@ import { Transaction } from '@prisma/client';
 
 export type TransactionResponse = {
   id: number;
-  bankAccountId: number;
+  bankAccountId?: number | null;
   billId: number;
   transactionTypeId: number;
   transactionStatusId: number;
@@ -10,7 +10,7 @@ export type TransactionResponse = {
 };
 
 export type CreateTransactionRequest = {
-  bankAccountId: number;
+  bankAccountId?: number | null;
   billId: number;
   transactionTypeId: number;
   transactionStatusId: number;
@@ -18,7 +18,7 @@ export type CreateTransactionRequest = {
 
 export type UpdateTransactionRequest = {
   id: number;
-  bankAccountId: number;
+  bankAccountId?: number | null;
   billId: number;
   transactionTypeId: number;
   transactionStatusId: number;

@@ -387,7 +387,7 @@ model Bill {
 
 model Transaction {
   id                  Int       @id @default(autoincrement())
-  bankAccountId       Int       @map("bank_account_id")
+  bankAccountId       Int?      @map("bank_account_id")
   billId              Int       @map("bill_id")
   transactionTypeId   Int       @map("transaction_type_id")
   transactionStatusId Int       @map("transaction_status_id")
@@ -396,7 +396,7 @@ model Transaction {
   updatedAt           DateTime? @updatedAt @map("updated_at")
   updatedBy           Int?      @map("updated_by")
 
-  BankAccount       BankAccount        @relation(fields: [bankAccountId], references: [id])
+  BankAccount       BankAccount?       @relation(fields: [bankAccountId], references: [id])
   Bill              Bill?              @relation(fields: [billId], references: [id])
   TransactionType   TransactionType?   @relation(fields: [transactionTypeId], references: [id])
   TransactionStatus TransactionStatus? @relation(fields: [transactionStatusId], references: [id])
@@ -490,7 +490,7 @@ model AcademicPeriod {
   startDate   DateTime
   endDate     DateTime
   description String?
-  isActive    Boolean   @default(true)
+  isActive    Boolean   @default(false)
   createdAt   DateTime? @default(now()) @map("created_at")
   createdBy   Int?      @map("created_by")
   updatedAt   DateTime? @updatedAt @map("updated_at")
@@ -522,10 +522,16 @@ model AcademicCalendar {
   @@map("academic_calendar")
 }
 
+enum FeeType {
+  FULL_TUITION
+  DOWN_PAYMENT
+  FINAL_INSTALLMENT
+}
+
 model PaymentFee {
   id               Int            @id @default(autoincrement())
   academicPeriodId Int            @map("academic_period_id")
-  feeType          String
+  feeType          FeeType
   amount           Decimal
   description      String?
   dueDate          DateTime       @map("due_date")
