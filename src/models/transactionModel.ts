@@ -1,27 +1,32 @@
-import { Transaction } from '@prisma/client';
+import { FeeType, Transaction, TransactionStatusEnum } from '@prisma/client';
+import { Decimal } from '@prisma/client/runtime/library';
 
+// TODO: change the transaction type with enum FeeType
 export type TransactionResponse = {
   id: number;
   bankAccountId?: number | null;
   billId: number;
-  transactionTypeId: number;
-  transactionStatusId: number;
+  transactionType: FeeType;
+  transactionStatus: TransactionStatusEnum;
+  amount: number;
   createdBy: number | null;
 };
 
 export type CreateTransactionRequest = {
   bankAccountId?: number | null;
   billId: number;
-  transactionTypeId: number;
-  transactionStatusId: number;
+  transactionType: FeeType;
+  transactionStatus: TransactionStatusEnum;
+  amount: number;
 };
 
 export type UpdateTransactionRequest = {
   id: number;
   bankAccountId?: number | null;
-  billId: number;
-  transactionTypeId: number;
-  transactionStatusId: number;
+  billId?: number;
+  transactionType?: FeeType;
+  transactionStatus?: TransactionStatusEnum;
+  amount: number;
 };
 
 export function toTransactionResponse(
@@ -31,8 +36,9 @@ export function toTransactionResponse(
     id: transaction.id,
     bankAccountId: transaction.bankAccountId,
     billId: transaction.billId,
-    transactionStatusId: transaction.transactionStatusId,
-    transactionTypeId: transaction.transactionTypeId,
+    transactionStatus: transaction.transactionStatus,
+    transactionType: transaction.transactionType,
+    amount: (transaction.amount as Decimal).toNumber(),
     createdBy: transaction.createdBy,
   };
 }

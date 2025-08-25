@@ -1,7 +1,7 @@
 import { Validation } from '../common/type/validation';
 import { dbClient } from '../common/provider/database';
 import { BadRequest } from '../exceptions/error/badRequest';
-import { Admin, Transaction } from '@prisma/client';
+import { Transaction, TransactionStatusEnum, User } from '@prisma/client';
 import {
   CreateTransactionRequest,
   toTransactionResponse,
@@ -9,10 +9,12 @@ import {
   UpdateTransactionRequest,
 } from '../models/transactionModel';
 import { TransactionSchemaValidation } from '../schemas/transactionSchemaValidation';
+import { BillService } from './billService';
+import { BillResponse } from '../models/billModel';
 
 export class TransactionService {
   static async create(
-    admin: Admin,
+    user: User,
     req: CreateTransactionRequest,
   ): Promise<TransactionResponse> {
     const validRequest: CreateTransactionRequest = Validation.validate(
@@ -20,29 +22,33 @@ export class TransactionService {
       req,
     );
 
-    const totalTransactionWithSameTransaction: number =
-      await dbClient.transaction.count({
-        where: {
-          transactionTypeId: validRequest.transactionTypeId,
-          transactionStatusId: validRequest.transactionStatusId,
-          billId: validRequest.billId,
-          bankAccountId: validRequest.bankAccountId,
-        },
-      });
+    const existingBill: BillResponse = await BillService.get(
+      validRequest.billId,
+    );
 
-    if (totalTransactionWithSameTransaction !== 0) {
-      throw new BadRequest('duplicate transaction');
+    if (
+      existingBill.remainBill < validRequest.amount &&
+      validRequest.amount! < 0
+    ) {
+      throw new BadRequest('too much money to pay');
     }
 
     const data = await dbClient.transaction.create({
-      data: { ...validRequest, createdBy: admin.id },
+      data: { ...validRequest, createdBy: user.id },
     });
+
+    if (validRequest.transactionStatus === TransactionStatusEnum.SUCCESS) {
+      await BillService.update(user, {
+        id: validRequest.billId,
+        remainBill: existingBill.remainBill - validRequest.amount,
+      });
+    }
 
     return toTransactionResponse(data);
   }
 
   static async update(
-    admin: Admin,
+    user: User,
     req: UpdateTransactionRequest,
   ): Promise<TransactionResponse> {
     const validRequest: UpdateTransactionRequest = Validation.validate(
@@ -60,35 +66,30 @@ export class TransactionService {
       throw new BadRequest('data does not exist');
     }
 
-    const mergedData = {
-      transactionTypeId:
-        validRequest.transactionTypeId ?? existingData.transactionTypeId,
-      transactionStatusId:
-        validRequest.transactionStatusId ?? existingData.transactionStatusId,
-      bankAccountId: validRequest.bankAccountId ?? existingData.bankAccountId,
-      billId: validRequest.billId ?? existingData.billId,
-    };
+    const existingBill: BillResponse = await BillService.get(
+      existingData.billId,
+    );
 
-    const totalTransactionWithSameTransaction =
-      await dbClient.transaction.count({
-        where: {
-          ...mergedData,
-          NOT: {
-            id: validRequest.id,
-          },
-        },
-      });
-
-    if (totalTransactionWithSameTransaction !== 0) {
-      throw new BadRequest('duplicate transaction');
+    if (
+      existingBill.remainBill < validRequest.amount &&
+      validRequest.amount! < 0
+    ) {
+      throw new BadRequest('too much money to pay');
     }
 
     const result = await dbClient.transaction.update({
       where: {
         id: validRequest.id,
       },
-      data: { ...validRequest, updatedBy: admin.id },
+      data: { ...validRequest, updatedBy: user.id },
     });
+
+    if (validRequest.transactionStatus === TransactionStatusEnum.SUCCESS) {
+      await BillService.update(user, {
+        id: existingData.billId,
+        remainBill: existingBill.remainBill - validRequest.amount,
+      });
+    }
 
     return toTransactionResponse(result);
   }

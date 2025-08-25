@@ -1,15 +1,15 @@
 import { NextFunction, Response } from 'express';
-import { AdminRequest } from '../type/adminRequest';
 import { TransactionService } from '../services/transactionService';
 import {
   CreateTransactionRequest,
   TransactionResponse,
   UpdateTransactionRequest,
 } from '../models/transactionModel';
+import { UserRequest } from '../type/userRequest';
 
 export class TransactionController {
   static async create(
-    req: AdminRequest,
+    req: UserRequest,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -17,7 +17,7 @@ export class TransactionController {
       const request: CreateTransactionRequest =
         req.body as CreateTransactionRequest;
       const response: TransactionResponse = await TransactionService.create(
-        req.admin!,
+        req.user!,
         request,
       );
       res.status(200).json({ data: response });
@@ -27,7 +27,7 @@ export class TransactionController {
   }
 
   static async update(
-    req: AdminRequest,
+    req: UserRequest,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -35,7 +35,7 @@ export class TransactionController {
       const request: UpdateTransactionRequest =
         req.body as UpdateTransactionRequest;
       const response: TransactionResponse = await TransactionService.update(
-        req.admin!,
+        req.user!,
         request,
       );
       res.status(200).json({ data: response });
@@ -45,7 +45,7 @@ export class TransactionController {
   }
 
   static async get(
-    req: AdminRequest,
+    req: UserRequest,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -59,7 +59,7 @@ export class TransactionController {
   }
 
   static async getAll(
-    req: AdminRequest,
+    req: UserRequest,
     res: Response,
     next: NextFunction,
   ): Promise<void> {

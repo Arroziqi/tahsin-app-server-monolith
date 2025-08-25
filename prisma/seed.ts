@@ -2,11 +2,13 @@ import {
   AttendanceStatus,
   ClassType,
   Education,
+  FeeType,
   PrismaClient,
   Program,
   Role,
   StudentStatusEnum,
   TimeOfStudy,
+  TransactionStatusEnum,
 } from '@prisma/client';
 import { hashPassword } from '../src/common/provider/hash';
 
@@ -362,8 +364,9 @@ async function main() {
     data: {
       bankAccountId: bankAccount.id,
       billId: bill.id,
-      transactionTypeId: transfer.id,
-      transactionStatusId: paid.id,
+      transactionType: FeeType.DOWN_PAYMENT,
+      transactionStatus: TransactionStatusEnum.PENDING,
+      amount: 300000,
       createdAt: now,
       updatedAt: now,
       updatedBy: superAdmin.id,

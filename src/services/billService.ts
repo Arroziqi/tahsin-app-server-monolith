@@ -100,6 +100,9 @@ export class BillService {
     const data = await dbClient.bill.findFirst({
       where: { studentId },
     });
+
+    if (!data) throw new BadRequest('Bill not found');
+
     return toBillResponse(data!);
   }
 

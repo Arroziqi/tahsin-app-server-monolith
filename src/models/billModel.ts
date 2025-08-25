@@ -18,9 +18,9 @@ export type CreateBillRequest = {
 
 export type UpdateBillRequest = {
   id: number;
-  bill: number;
-  studentId: number;
-  remainBill: number;
+  bill?: number;
+  studentId?: number;
+  remainBill?: number;
   description?: string | null;
 };
 

@@ -207,8 +207,6 @@ model TransactionStatus {
   updatedAt DateTime? @updatedAt @map("updated_at")
   updatedBy Int?      @map("updated_by")
 
-  Transactions Transaction[]
-
   @@map("transaction_status")
 }
 
@@ -385,22 +383,30 @@ model Bill {
   @@map("bill")
 }
 
-model Transaction {
-  id                  Int       @id @default(autoincrement())
-  bankAccountId       Int?      @map("bank_account_id")
-  billId              Int       @map("bill_id")
-  transactionTypeId   Int       @map("transaction_type_id")
-  transactionStatusId Int       @map("transaction_status_id")
-  createdAt           DateTime? @default(now()) @map("created_at")
-  createdBy           Int?      @map("created_by")
-  updatedAt           DateTime? @updatedAt @map("updated_at")
-  updatedBy           Int?      @map("updated_by")
+enum TransactionStatusEnum {
+  PENDING
+  SUCCESS
+  FAILED
+  CANCELLED
+}
 
-  BankAccount       BankAccount?       @relation(fields: [bankAccountId], references: [id])
-  Bill              Bill?              @relation(fields: [billId], references: [id])
-  TransactionType   TransactionType?   @relation(fields: [transactionTypeId], references: [id])
-  TransactionStatus TransactionStatus? @relation(fields: [transactionStatusId], references: [id])
+model Transaction {
+  id                Int                   @id @default(autoincrement())
+  bankAccountId     Int?                  @map("bank_account_id")
+  billId            Int                   @map("bill_id")
+  transactionType   FeeType               @default(DOWN_PAYMENT) @map("transaction_type")
+  transactionStatus TransactionStatusEnum @default(PENDING) @map("transaction_status")
+  amount            Decimal
+  createdAt         DateTime?             @default(now()) @map("created_at")
+  createdBy         Int?                  @map("created_by")
+  updatedAt         DateTime?             @updatedAt @map("updated_at")
+  updatedBy         Int?                  @map("updated_by")
+
+  BankAccount       BankAccount?     @relation(fields: [bankAccountId], references: [id])
+  Bill              Bill?            @relation(fields: [billId], references: [id])
   Event             Event[]
+  TransactionType   TransactionType? @relation(fields: [transactionTypeId], references: [id])
+  transactionTypeId Int?
 
   @@map("transaction")
 }

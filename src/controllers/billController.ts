@@ -56,6 +56,20 @@ export class BillController {
     }
   }
 
+  static async getByStudentId(
+    req: UserRequest,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const id: number = Number(req.params.id);
+      const response: BillResponse = await BillService.getByStudentId(id);
+      res.status(200).json({ data: response });
+    } catch (e) {
+      next(e);
+    }
+  }
+
   static async getAll(
     req: UserRequest,
     res: Response,
