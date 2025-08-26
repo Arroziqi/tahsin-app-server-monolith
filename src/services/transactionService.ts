@@ -22,9 +22,15 @@ export class TransactionService {
       req,
     );
 
+    console.log('validation successfully', validRequest);
+
     const existingBill: BillResponse = await BillService.get(
       validRequest.billId,
     );
+
+    if (!validRequest.studentId) {
+      validRequest.studentId = existingBill.studentId;
+    }
 
     if (
       existingBill.remainBill < validRequest.amount &&
@@ -102,7 +108,12 @@ export class TransactionService {
   }
 
   static async getAll(): Promise<TransactionResponse[]> {
-    const data: Transaction[] = await dbClient.transaction.findMany();
+    const data: Transaction[] = await dbClient.transaction.findMany({
+      include: {
+        Bill: true,
+        Student: true,
+      },
+    });
 
     return data.map(
       (item: Transaction): TransactionResponse => toTransactionResponse(item),

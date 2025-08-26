@@ -1,20 +1,31 @@
-import { FeeType, Transaction, TransactionStatusEnum } from '@prisma/client';
+import {
+  Bill,
+  FeeType,
+  Transaction,
+  TransactionStatusEnum,
+} from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
+import { BillResponse } from './billModel';
+import { StudentResponse } from './studentModel';
 
-// TODO: change the transaction type with enum FeeType
 export type TransactionResponse = {
   id: number;
   bankAccountId?: number | null;
   billId: number;
+  studentId?: number;
   transactionType: FeeType;
   transactionStatus: TransactionStatusEnum;
   amount: number;
   createdBy: number | null;
+  createdAt?: Date | null;
+  Bill?: BillResponse;
+  Student?: StudentResponse;
 };
 
 export type CreateTransactionRequest = {
   bankAccountId?: number | null;
   billId: number;
+  studentId?: number;
   transactionType: FeeType;
   transactionStatus: TransactionStatusEnum;
   amount: number;
@@ -22,6 +33,7 @@ export type CreateTransactionRequest = {
 
 export type UpdateTransactionRequest = {
   id: number;
+  studentId?: number;
   bankAccountId?: number | null;
   billId?: number;
   transactionType?: FeeType;
@@ -30,15 +42,19 @@ export type UpdateTransactionRequest = {
 };
 
 export function toTransactionResponse(
-  transaction: Transaction,
+  transaction: Transaction & { Bill?: Bill; Student?: StudentResponse },
 ): TransactionResponse {
   return {
     id: transaction.id,
     bankAccountId: transaction.bankAccountId,
     billId: transaction.billId,
+    studentId: transaction.studentId ?? undefined,
     transactionStatus: transaction.transactionStatus,
     transactionType: transaction.transactionType,
     amount: (transaction.amount as Decimal).toNumber(),
     createdBy: transaction.createdBy,
+    createdAt: transaction.createdAt,
+    Bill: transaction.Bill,
+    Student: transaction.Student,
   };
 }

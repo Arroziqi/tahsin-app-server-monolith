@@ -74,13 +74,14 @@ model Student {
   updatedAt     DateTime?          @updatedAt @map("updated_at")
   updatedBy     Int?               @map("updated_by")
 
-  User        User         @relation(fields: [userId], references: [id])
-  Level       Level?       @relation(fields: [levelId], references: [id])
-  Class       Class?       @relation(fields: [classId], references: [id])
-  Enrollment  Enrollment   @relation(fields: [enrollmentId], references: [id])
+  User        User          @relation(fields: [userId], references: [id])
+  Level       Level?        @relation(fields: [levelId], references: [id])
+  Class       Class?        @relation(fields: [classId], references: [id])
+  Enrollment  Enrollment    @relation(fields: [enrollmentId], references: [id])
   Scores      Score[]
   Attendances Attendance[]
   Bills       Bill[]
+  Transaction Transaction[]
 
   @@map("student")
 }
@@ -397,16 +398,19 @@ model Transaction {
   transactionType   FeeType               @default(DOWN_PAYMENT) @map("transaction_type")
   transactionStatus TransactionStatusEnum @default(PENDING) @map("transaction_status")
   amount            Decimal
-  createdAt         DateTime?             @default(now()) @map("created_at")
-  createdBy         Int?                  @map("created_by")
-  updatedAt         DateTime?             @updatedAt @map("updated_at")
-  updatedBy         Int?                  @map("updated_by")
+  studentId         Int?                  @map("student_id")
+
+  createdAt DateTime? @default(now()) @map("created_at")
+  createdBy Int?      @map("created_by")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  updatedBy Int?      @map("updated_by")
 
   BankAccount       BankAccount?     @relation(fields: [bankAccountId], references: [id])
   Bill              Bill?            @relation(fields: [billId], references: [id])
   Event             Event[]
   TransactionType   TransactionType? @relation(fields: [transactionTypeId], references: [id])
   transactionTypeId Int?
+  Student           Student?         @relation(fields: [studentId], references: [id])
 
   @@map("transaction")
 }
