@@ -98,7 +98,7 @@ export class TimeService {
       throw new BadRequest('Time must be 2 hours');
     }
 
-    if (await this.isOverlapping(startMinutes, endMinutes)) {
+    if (await this.isOverlapping(startMinutes, endMinutes, validRequest.id)) {
       throw new BadRequest('Time overlaps with existing session');
     }
 

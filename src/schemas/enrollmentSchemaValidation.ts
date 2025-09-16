@@ -1,5 +1,5 @@
 import { z, ZodType } from 'zod';
-import { ClassType, Education, Program, TimeOfStudy } from '@prisma/client';
+import { ClassType, Education, Program } from '@prisma/client';
 
 export class EnrollmentSchemaValidation {
   static readonly CREATE: ZodType = z.object({
@@ -16,7 +16,7 @@ export class EnrollmentSchemaValidation {
     lastEducation: z.nativeEnum(Education),
     program: z.nativeEnum(Program),
     classType: z.nativeEnum(ClassType),
-    timeOfStudy: z.nativeEnum(TimeOfStudy),
+    timeOfStudyId: z.number(),
     motivation: z.string(),
     voiceRecording: z.string().optional(),
     dateOfReservation: z
@@ -31,7 +31,7 @@ export class EnrollmentSchemaValidation {
     academicPeriodId: z.number(),
     userId: z.number().optional(),
     studentId: z.number().optional(),
-    classId: z.number().optional(),
+    // classId: z.number().optional(),
   });
   static readonly UPDATE: ZodType = z.object({
     id: z.number(),
@@ -49,7 +49,7 @@ export class EnrollmentSchemaValidation {
     lastEducation: z.nativeEnum(Education).optional(),
     program: z.nativeEnum(Program).optional(),
     classType: z.nativeEnum(ClassType).optional(),
-    timeOfStudy: z.nativeEnum(TimeOfStudy).optional(),
+    timeOfStudyId: z.number().optional(),
     motivation: z.string().optional(),
     voiceRecording: z.string().optional(),
     dateOfReservation: z
@@ -62,6 +62,6 @@ export class EnrollmentSchemaValidation {
       }, z.date())
       .optional(),
     userId: z.number().optional(),
-    classId: z.number().optional(),
+    // classId: z.number().optional(),
   });
 }

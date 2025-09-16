@@ -3,7 +3,7 @@ import { Teacher, TeacherStatus, User } from '@prisma/client';
 export type TeacherResponse = {
   id: number;
   name: string;
-  nip?: string;
+  nip?: string | null;
   noTelp: string;
   status: TeacherStatus;
   accountNumber?: string | null;
@@ -11,7 +11,7 @@ export type TeacherResponse = {
   bankName?: string | null;
   userId: number | null;
   createdBy: number | null;
-  createdAt?: Date;
+  createdAt?: Date | null;
   User?: {
     username: string;
     email: string;

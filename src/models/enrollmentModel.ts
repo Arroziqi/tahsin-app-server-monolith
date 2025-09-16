@@ -1,10 +1,13 @@
 import {
   ClassType,
+  Day,
   Education,
   Enrollment,
   Program,
-  TimeOfStudy,
+  Schedule,
+  Time,
 } from '@prisma/client';
+import { ScheduleResponseShort } from './scheduleModel';
 
 export type EnrollmentResponse = {
   id: number;
@@ -16,13 +19,15 @@ export type EnrollmentResponse = {
   lastEducation: Education;
   program: Program;
   classType: ClassType;
-  timeOfStudy: TimeOfStudy;
+  timeOfStudyId: number;
   voiceRecording?: string;
   dateOfReservation?: Date;
   academicPeriodId: number;
   userId?: number;
   classId?: number | null;
   createdBy: number | null;
+
+  Schedule?: ScheduleResponseShort;
 };
 
 export type CreateEnrollmentRequest = {
@@ -35,7 +40,7 @@ export type CreateEnrollmentRequest = {
   lastEducation: Education;
   program: Program;
   classType: ClassType;
-  timeOfStudy: TimeOfStudy;
+  timeOfStudyId: number;
   voiceRecording?: string;
   dateOfReservation?: Date;
   academicPeriodId: number;
@@ -54,7 +59,7 @@ export type RegisterEnrollmentRequest = {
   lastEducation: Education;
   program: Program;
   classType: ClassType;
-  timeOfStudy: TimeOfStudy;
+  timeOfStudyId: number;
   voiceRecording?: string;
   dateOfReservation?: Date;
   academicPeriodId: number;
@@ -73,7 +78,7 @@ export type UpdateEnrollmentRequest = {
   lastEducation: Education;
   program: Program;
   classType: ClassType;
-  timeOfStudy: TimeOfStudy;
+  timeOfStudyId: number;
   voiceRecording?: string;
   dateOfReservation?: Date;
   academicPeriodId: number;
@@ -82,7 +87,12 @@ export type UpdateEnrollmentRequest = {
 };
 
 export function toEnrollmentResponse(
-  enrollment: Enrollment,
+  enrollment: Enrollment & {
+    Schedule?: Schedule & {
+      Day?: Day;
+      Time?: Time;
+    };
+  },
 ): EnrollmentResponse {
   return {
     id: enrollment.id,
@@ -97,9 +107,17 @@ export function toEnrollmentResponse(
     lastEducation: enrollment.lastEducation,
     program: enrollment.program,
     classType: enrollment.classType,
-    timeOfStudy: enrollment.timeOfStudy,
+    timeOfStudyId: enrollment.timeOfStudyId,
     motivation: enrollment.motivation,
     voiceRecording: enrollment.voiceRecording ?? undefined,
     dateOfReservation: enrollment.dateOfReservation ?? undefined,
+
+    Schedule: enrollment.Schedule
+      ? {
+          id: enrollment.Schedule.id,
+          day: enrollment.Schedule.Day?.day ?? '',
+          session: enrollment.Schedule.Time?.session ?? '',
+        }
+      : undefined,
   };
 }

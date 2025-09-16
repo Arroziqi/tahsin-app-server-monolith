@@ -11,6 +11,7 @@ import {
 import { TransactionSchemaValidation } from '../schemas/transactionSchemaValidation';
 import { BillService } from './billService';
 import { BillResponse } from '../models/billModel';
+import { StudentService } from './studentService';
 
 export class TransactionService {
   static async create(
@@ -47,6 +48,11 @@ export class TransactionService {
       await BillService.update(user, {
         id: validRequest.billId,
         remainBill: existingBill.remainBill - validRequest.amount,
+      });
+
+      await StudentService.update(user, {
+        studentStatus: 'ACTIVE',
+        id: validRequest.studentId,
       });
     }
 
@@ -94,6 +100,19 @@ export class TransactionService {
       await BillService.update(user, {
         id: existingData.billId,
         remainBill: existingBill.remainBill - validRequest.amount,
+      });
+    } else if (
+      validRequest.transactionStatus === TransactionStatusEnum.FAILED ||
+      validRequest.transactionStatus === TransactionStatusEnum.CANCELLED
+    ) {
+      await BillService.update(user, {
+        id: existingBill.id,
+        remainBill: existingBill.remainBill + validRequest.amount,
+      });
+
+      await StudentService.update(user, {
+        studentStatus: 'INACTIVE',
+        id: existingBill.studentId,
       });
     }
 

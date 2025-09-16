@@ -16,8 +16,14 @@ export type ScheduleResponse = {
   isActive?: boolean;
 
   createdBy: number | null;
-  Day: Partial<DayResponse>;
-  Time: Partial<TimeResponse>;
+  Day?: Partial<DayResponse>;
+  Time?: Partial<TimeResponse>;
+};
+
+export type ScheduleResponseShort = {
+  id: number;
+  day: string;
+  session: string;
 };
 
 export type CreateScheduleRequest = {

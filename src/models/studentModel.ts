@@ -8,12 +8,13 @@ export type StudentResponse = {
   lastEducation?: Education | null;
   motivation: string;
   userId: number;
-  username: string; // baru
-  email: string; // baru
+  username: string;
+  email: string;
   levelId?: number | null;
   classId?: number | null;
   enrollmentId: number;
   studentStatus?: StudentStatusEnum | null;
+  classScheduleId?: number | null;
   createdBy: number | null;
 };
 
@@ -32,7 +33,7 @@ export type CreateStudentRequest = {
 
 export type UpdateStudentRequest = {
   id: number;
-  fullName: string;
+  fullName?: string;
   dateOfBirth?: Date | null;
   noTelp?: string | null;
   lastEducation?: Education | null;
@@ -40,6 +41,7 @@ export type UpdateStudentRequest = {
   classId?: number | null;
   enrollmentId?: number;
   studentStatus?: StudentStatusEnum | null;
+  classScheduleId?: number | null;
 };
 
 export function toStudentResponse(
@@ -53,12 +55,13 @@ export function toStudentResponse(
     lastEducation: student.lastEducation,
     motivation: student.motivation,
     userId: student.userId,
-    username: student.User.username, // ambil dari relasi
-    email: student.User.email, // ambil dari relasi
+    username: student.User.username,
+    email: student.User.email,
     levelId: student.levelId,
     classId: student.classId,
     enrollmentId: student.enrollmentId,
     studentStatus: student.studentStatus,
+    classScheduleId: student.classScheduleId,
     createdBy: student.createdBy,
   };
 }

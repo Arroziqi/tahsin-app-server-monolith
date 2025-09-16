@@ -1,7 +1,7 @@
 import { Validation } from '../common/type/validation';
 import { dbClient } from '../common/provider/database';
 import { BadRequest } from '../exceptions/error/badRequest';
-import { Enrollment, FeeType, User } from '@prisma/client';
+import { Day, Enrollment, FeeType, Schedule, Time, User } from '@prisma/client';
 import {
   CreateEnrollmentRequest,
   EnrollmentResponse,
@@ -173,12 +173,32 @@ export class EnrollmentService {
   static async get(id: number): Promise<EnrollmentResponse> {
     const data = await dbClient.enrollment.findFirst({
       where: { id },
+      include: {
+        Schedule: {
+          include: { Day: true, Time: true },
+        },
+      },
     });
-    return toEnrollmentResponse(data!);
+
+    if (!data) {
+      throw new BadRequest('Enrollment not found'); // atau error handling lain
+    }
+
+    return toEnrollmentResponse(
+      data as Enrollment & {
+        Schedule?: Schedule & { Day?: Day; Time?: Time };
+      },
+    );
   }
 
   static async getAll(): Promise<EnrollmentResponse[]> {
-    const data: Enrollment[] = await dbClient.enrollment.findMany();
+    const data: Enrollment[] = await dbClient.enrollment.findMany({
+      include: {
+        Schedule: {
+          include: { Day: true, Time: true },
+        },
+      },
+    });
 
     return data.map(
       (item: Enrollment): EnrollmentResponse => toEnrollmentResponse(item),

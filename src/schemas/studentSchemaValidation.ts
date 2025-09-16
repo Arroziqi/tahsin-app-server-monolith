@@ -37,5 +37,6 @@ export class StudentSchemaValidation {
     classId: z.number().optional(),
     enrollmentId: z.number().optional(),
     studentStatus: z.nativeEnum(StudentStatusEnum).optional(),
+    classScheduleId: z.number().optional(),
   });
 }
