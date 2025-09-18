@@ -27,6 +27,7 @@ import { eventRouter } from './event/eventRouter';
 import { academicPeriodRouter } from './academicPeriod/academicPeriodRouter';
 import { academicCalendarRouter } from './academicCalendar/academicCalendarRouter';
 import { paymentFeeRouter } from './paymentFee/paymentFeeRouter';
+import { classScheduleRouter } from './classSchedule/classScheduleRouter';
 
 export const superRouter: Router = express.Router();
 superRouter.use(userRouter);
@@ -57,3 +58,4 @@ superRouter.use(eventRouter);
 superRouter.use(academicPeriodRouter);
 superRouter.use(academicCalendarRouter);
 superRouter.use(paymentFeeRouter);
+superRouter.use(classScheduleRouter);

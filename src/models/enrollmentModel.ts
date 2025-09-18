@@ -24,7 +24,7 @@ export type EnrollmentResponse = {
   dateOfReservation?: Date;
   academicPeriodId: number;
   userId?: number;
-  classId?: number | null;
+  classScheduleId?: number | null;
   createdBy: number | null;
 
   Schedule?: ScheduleResponseShort;
@@ -46,7 +46,7 @@ export type CreateEnrollmentRequest = {
   academicPeriodId: number;
   userId?: number;
   studentId?: number; // only for detecting is the student already registered or not
-  classId?: number | null;
+  classScheduleId?: number | null;
 };
 
 export type RegisterEnrollmentRequest = {
@@ -64,7 +64,7 @@ export type RegisterEnrollmentRequest = {
   dateOfReservation?: Date;
   academicPeriodId: number;
   userId: number;
-  classId?: number | null;
+  classScheduleId?: number | null;
 };
 
 export type UpdateEnrollmentRequest = {
@@ -83,7 +83,7 @@ export type UpdateEnrollmentRequest = {
   dateOfReservation?: Date;
   academicPeriodId: number;
   userId?: number;
-  classId?: number | null;
+  classScheduleId?: number | null;
 };
 
 export function toEnrollmentResponse(
@@ -98,7 +98,7 @@ export function toEnrollmentResponse(
     id: enrollment.id,
     academicPeriodId: enrollment.academicPeriodId,
     userId: enrollment.userId,
-    classId: enrollment.classId,
+    classScheduleId: enrollment.classScheduleId,
     createdBy: enrollment.createdBy,
     fullName: enrollment.fullName,
     dateOfBirth: enrollment.dateOfBirth,

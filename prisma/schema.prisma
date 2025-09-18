@@ -58,22 +58,23 @@ enum StudentStatusEnum {
 }
 
 model Student {
-  id              Int                @id @default(autoincrement())
-  fullName        String             @map("full_name")
-  dateOfBirth     DateTime?          @map("date_of_birth")
-  noTelp          String?            @map("no_telp")
-  lastEducation   Education?         @map("last_education")
-  motivation      String
-  userId          Int                @unique @map("user_id")
-  levelId         Int?               @map("level_id")
-  classId         Int?               @map("class_id")
-  enrollmentId    Int                @map("enrollment_id")
-  studentStatus   StudentStatusEnum? @default(INACTIVE) @map("student_status")
-  classScheduleId Int?               @map("class_schedule_id")
-  createdAt       DateTime?          @default(now()) @map("created_at")
-  createdBy       Int?               @map("created_by")
-  updatedAt       DateTime?          @updatedAt @map("updated_at")
-  updatedBy       Int?               @map("updated_by")
+  id                  Int                @id @default(autoincrement())
+  fullName            String             @map("full_name")
+  dateOfBirth         DateTime?          @map("date_of_birth")
+  noTelp              String?            @map("no_telp")
+  lastEducation       Education?         @map("last_education")
+  motivation          String
+  userId              Int                @unique @map("user_id")
+  levelId             Int?               @map("level_id")
+  classId             Int?               @map("class_id")
+  enrollmentId        Int                @map("enrollment_id")
+  studentStatus       StudentStatusEnum? @default(INACTIVE) @map("student_status")
+  preferredScheduleId Int?               @map("preferred_schedule_id")
+  classScheduleId     Int?               @map("class_schedule_id")
+  createdAt           DateTime?          @default(now()) @map("created_at")
+  createdBy           Int?               @map("created_by")
+  updatedAt           DateTime?          @updatedAt @map("updated_at")
+  updatedBy           Int?               @map("updated_by")
 
   User          User           @relation(fields: [userId], references: [id])
   Level         Level?         @relation(fields: [levelId], references: [id])
@@ -84,6 +85,7 @@ model Student {
   Bills         Bill[]
   Transaction   Transaction[]
   ClassSchedule ClassSchedule? @relation(fields: [classScheduleId], references: [id])
+  Schedule      Schedule?      @relation(fields: [preferredScheduleId], references: [id])
 
   @@map("student")
 }
@@ -252,12 +254,11 @@ model Class {
   updatedAt    DateTime? @updatedAt @map("updated_at")
   updatedBy    Int?      @map("updated_by")
 
-  ClassPrice  ClassPrice   @relation(fields: [classPriceId], references: [id])
-  Batch       Batch?       @relation(fields: [batchId], references: [id])
-  Students    Student[]
-  Modules     Module[]
-  Schedules   Schedule[]
-  Enrollments Enrollment[]
+  ClassPrice ClassPrice @relation(fields: [classPriceId], references: [id])
+  Batch      Batch?     @relation(fields: [batchId], references: [id])
+  Students   Student[]
+  Modules    Module[]
+  Schedules  Schedule[]
 
   @@map("class")
 }
@@ -276,14 +277,15 @@ model Schedule {
   Day            Day?             @relation(fields: [dayId], references: [id])
   Time           Time?            @relation(fields: [timeId], references: [id])
   Attendances    Attendance[]
-  Teacher        Teacher?         @relation(fields: [teacherId], references: [id])
-  teacherId      Int?
   Class          Class?           @relation(fields: [classId], references: [id])
   classId        Int?
   Event          Event[]
   AcademicPeriod AcademicPeriod[]
   Enrollment     Enrollment[]
   ClassSchedule  ClassSchedule[]
+  Teacher        Teacher?         @relation(fields: [teacherId], references: [id])
+  teacherId      Int?
+  Student        Student[]
 
   @@map("schedule")
 }
@@ -458,15 +460,16 @@ model Enrollment {
   dateOfReservation DateTime? @map("date_of_reservation")
   academicPeriodId  Int       @map("academic_period_id")
   userId            Int       @map("user_id")
-  classId           Int?      @map("class_id")
-  createdAt         DateTime? @default(now()) @map("created_at")
-  createdBy         Int?      @map("created_by")
-  updatedAt         DateTime? @updatedAt @map("updated_at")
-  updatedBy         Int?      @map("updated_by")
+  classScheduleId   Int?      @map("class_schedule_id")
+
+  createdAt DateTime? @default(now()) @map("created_at")
+  createdBy Int?      @map("created_by")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  updatedBy Int?      @map("updated_by")
 
   AcademicPeriod AcademicPeriod? @relation(fields: [academicPeriodId], references: [id])
   User           User?           @relation(fields: [userId], references: [id])
-  Class          Class?          @relation(fields: [classId], references: [id])
+  ClassSchedule  ClassSchedule?  @relation(fields: [classScheduleId], references: [id])
   Students       Student[]
   Schedule       Schedule?       @relation(fields: [timeOfStudyId], references: [id])
 
@@ -579,8 +582,9 @@ model ClassSchedule {
   updatedAt DateTime? @updatedAt @map("updated_at")
   updatedBy Int?      @map("updated_by")
 
-  Level    Level?    @relation(fields: [levelId], references: [id])
-  Schedule Schedule? @relation(fields: [scheduleId], references: [id])
-  Teacher  Teacher?  @relation(fields: [teacherId], references: [id])
-  Student  Student[]
+  Level      Level?       @relation(fields: [levelId], references: [id])
+  Schedule   Schedule?    @relation(fields: [scheduleId], references: [id])
+  Teacher    Teacher?     @relation(fields: [teacherId], references: [id])
+  Student    Student[]
+  Enrollment Enrollment[]
 }

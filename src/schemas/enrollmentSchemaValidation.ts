@@ -31,7 +31,7 @@ export class EnrollmentSchemaValidation {
     academicPeriodId: z.number(),
     userId: z.number().optional(),
     studentId: z.number().optional(),
-    // classId: z.number().optional(),
+    classScheduleId: z.number().optional(),
   });
   static readonly UPDATE: ZodType = z.object({
     id: z.number(),
@@ -62,6 +62,6 @@ export class EnrollmentSchemaValidation {
       }, z.date())
       .optional(),
     userId: z.number().optional(),
-    // classId: z.number().optional(),
+    classScheduleId: z.number().optional(),
   });
 }

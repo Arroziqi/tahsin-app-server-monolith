@@ -15,6 +15,7 @@ export type StudentResponse = {
   enrollmentId: number;
   studentStatus?: StudentStatusEnum | null;
   classScheduleId?: number | null;
+  preferredScheduleId?: number | null;
   createdBy: number | null;
 };
 
@@ -29,6 +30,7 @@ export type CreateStudentRequest = {
   classId?: number | null;
   enrollmentId: number;
   studentStatus?: StudentStatusEnum | null;
+  preferredScheduleId?: number | null;
 };
 
 export type UpdateStudentRequest = {
@@ -42,6 +44,7 @@ export type UpdateStudentRequest = {
   enrollmentId?: number;
   studentStatus?: StudentStatusEnum | null;
   classScheduleId?: number | null;
+  preferredScheduleId?: number | null;
 };
 
 export function toStudentResponse(
@@ -62,6 +65,7 @@ export function toStudentResponse(
     enrollmentId: student.enrollmentId,
     studentStatus: student.studentStatus,
     classScheduleId: student.classScheduleId,
+    preferredScheduleId: student.preferredScheduleId,
     createdBy: student.createdBy,
   };
 }

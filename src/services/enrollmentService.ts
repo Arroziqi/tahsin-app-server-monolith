@@ -24,74 +24,72 @@ export class EnrollmentService {
     user: User,
     req: CreateEnrollmentRequest,
   ): Promise<EnrollmentResponse> {
-    const validRequest: CreateEnrollmentRequest = Validation.validate(
-      EnrollmentSchemaValidation.CREATE,
-      req,
-    );
-
-    let userId: number;
-
-    if (!validRequest.userId) {
-      // Buat user baru
-      const newUser: UserResponse = await UserService.create(user, {
-        ...req,
-        password: DEFAULT_PW_USER,
-      });
-      userId = newUser.id;
-    } else {
-      // Sudah ada user
-      userId = validRequest.userId;
-    }
-
-    // Cek duplikat enrollment
-    const totalEnrollmentWithSame = await dbClient.enrollment.count({
-      where: {
-        userId: userId,
-        // classId: validRequest.classId!,
-      },
-    });
-
-    if (totalEnrollmentWithSame > 0) {
-      throw new BadRequest('duplicate enrollment');
-    }
-
-    // Buat enrollment baru
-    const { username, ...enrollmentReq } = validRequest;
-    const enrollment = await dbClient.enrollment.create({
-      data: { ...enrollmentReq, userId, createdBy: user.id },
-    });
-
-    let student: StudentResponse;
-
-    if (validRequest.studentId) {
-      // CASE: student sudah terdaftar → update student
-      student = await StudentService.update(user, {
-        ...req,
-        id: validRequest.studentId,
-        enrollmentId: enrollment.id,
-      });
-    } else {
-      student = await StudentService.create(user, {
-        ...req,
-        userId,
-        enrollmentId: enrollment.id,
-      });
-    }
-
-    // buat bill
-    const paymentFeeResponse: PaymentFeeResponse =
-      await PaymentFeeService.getByAcademicPeriod(
-        enrollmentReq.academicPeriodId,
-        FeeType.DOWN_PAYMENT,
+    return dbClient.$transaction(async (tx) => {
+      const validRequest: CreateEnrollmentRequest = Validation.validate(
+        EnrollmentSchemaValidation.CREATE,
+        req,
       );
 
-    await BillService.create(user, {
-      bill: paymentFeeResponse.amount,
-      remainBill: paymentFeeResponse.amount,
-      studentId: student.id,
-    });
+      let userId: number;
 
-    return toEnrollmentResponse(enrollment);
+      if (!validRequest.userId) {
+        const newUser: UserResponse = await UserService.create(user, {
+          ...req,
+          password: DEFAULT_PW_USER,
+        });
+        userId = newUser.id;
+      } else {
+        userId = validRequest.userId;
+      }
+
+      const totalEnrollmentWithSame = await tx.enrollment.count({
+        where: {
+          userId: userId,
+          academicPeriodId: validRequest.academicPeriodId,
+        },
+      });
+
+      if (totalEnrollmentWithSame > 0) {
+        throw new BadRequest('duplicate enrollment');
+      }
+
+      const { username, ...enrollmentReq } = validRequest;
+      const enrollment = await tx.enrollment.create({
+        data: { ...enrollmentReq, userId, createdBy: user.id },
+      });
+
+      let student: StudentResponse;
+
+      if (validRequest.studentId) {
+        student = await StudentService.update(user, {
+          ...req,
+          id: validRequest.studentId,
+          enrollmentId: enrollment.id,
+          preferredScheduleId: enrollment.timeOfStudyId,
+        });
+      } else {
+        student = await StudentService.create(user, {
+          ...req,
+          userId,
+          enrollmentId: enrollment.id,
+          preferredScheduleId: enrollment.timeOfStudyId,
+        });
+      }
+
+      const paymentFeeResponse: PaymentFeeResponse =
+        await PaymentFeeService.getByAcademicPeriod(
+          enrollmentReq.academicPeriodId,
+          FeeType.DOWN_PAYMENT,
+        );
+
+      await BillService.create(user, {
+        bill: paymentFeeResponse.amount,
+        remainBill: paymentFeeResponse.amount,
+        studentId: student.id,
+      });
+
+      return toEnrollmentResponse(enrollment);
+    });
   }
 
   // TODO: this function is not satisfied with the requirement
@@ -108,7 +106,7 @@ export class EnrollmentService {
       await dbClient.enrollment.count({
         where: {
           userId: validRequest.userId,
-          classId: validRequest.classId,
+          academicPeriodId: validRequest.academicPeriodId,
         },
       });
 
@@ -127,47 +125,53 @@ export class EnrollmentService {
     user: User,
     req: UpdateEnrollmentRequest,
   ): Promise<EnrollmentResponse> {
-    const validRequest: UpdateEnrollmentRequest = Validation.validate(
-      EnrollmentSchemaValidation.UPDATE,
-      req,
-    );
+    return dbClient.$transaction(async (tx) => {
+      const validRequest: UpdateEnrollmentRequest = Validation.validate(
+        EnrollmentSchemaValidation.UPDATE,
+        req,
+      );
 
-    const existingData = await dbClient.enrollment.findFirst({
-      where: {
-        id: validRequest.id,
-      },
-    });
+      const existingData = await tx.enrollment.findUnique({
+        where: { id: validRequest.id },
+      });
 
-    if (!existingData) {
-      throw new BadRequest('data does not exist');
-    }
+      if (!existingData) {
+        throw new BadRequest('data does not exist');
+      }
 
-    const mergedData = {
-      classId: validRequest.classId ?? existingData.classId,
-      userId: validRequest.userId ?? existingData.userId,
-    };
-
-    const totalEnrollmentWithSameEnrollment = await dbClient.enrollment.count({
-      where: {
-        ...mergedData,
-        NOT: {
-          id: validRequest.id,
+      const totalEnrollmentWithSameEnrollment = await tx.enrollment.count({
+        where: {
+          academicPeriodId:
+            validRequest.academicPeriodId ?? existingData.academicPeriodId,
+          userId: validRequest.userId ?? existingData.userId,
+          NOT: { id: validRequest.id },
         },
-      },
+      });
+
+      if (totalEnrollmentWithSameEnrollment > 0) {
+        throw new BadRequest('duplicate enrollment');
+      }
+
+      const result = await tx.enrollment.update({
+        where: { id: validRequest.id },
+        data: { ...validRequest, updatedBy: user.id },
+      });
+
+      const student = await tx.student.findFirst({
+        where: { enrollmentId: result.id },
+      });
+
+      if (student) {
+        await StudentService.update(user, {
+          ...req,
+          id: student.id,
+          enrollmentId: result.id,
+          preferredScheduleId: result.timeOfStudyId,
+        });
+      }
+
+      return toEnrollmentResponse(result);
     });
-
-    if (totalEnrollmentWithSameEnrollment !== 0) {
-      throw new BadRequest('duplicate enrollment');
-    }
-
-    const result = await dbClient.enrollment.update({
-      where: {
-        id: validRequest.id,
-      },
-      data: { ...validRequest, updatedBy: user.id },
-    });
-
-    return toEnrollmentResponse(result);
   }
 
   static async get(id: number): Promise<EnrollmentResponse> {
