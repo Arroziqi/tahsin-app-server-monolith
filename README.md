@@ -102,6 +102,55 @@ Tahsin App mengadopsi arsitektur **MVC + Service Layer**:
 
 ---
 
+## 🏁 Getting Started
+
+> Pastikan **Node.js** dan **npm / pnpm / yarn** sudah terinstal di mesin kamu.
+
+1. **Clone repository**
+   ```bash
+   git clone https://github.com/username/tahsin-app-server.git
+   cd tahsin-app-server
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   npm install
+   # atau
+   pnpm install
+   ```
+
+3. **Setup environment**
+
+  * Duplikat file `.env.example` menjadi `.env`
+  * Isi variabel sesuai kebutuhan, contoh:
+
+    ```env
+    PORT=5000
+    DATABASE_URL="postgresql://postgres:password@localhost:5432/tahsin_app?schema=public"
+    DEFAULT_PW_USER=Pass1234
+    ```
+
+4. **Migrasi database**
+
+   ```bash
+   npx prisma migrate dev
+   ```
+
+5. **Seed data (opsional)**
+
+   ```bash
+   npx ts-node prisma/seed.ts
+   ```
+
+6. **Jalankan server**
+
+   ```bash
+   npm run dev
+   ```
+
+   Server akan berjalan di `http://localhost:3000` (atau port sesuai konfigurasi).
+
 ## 📄 Lisensi
 Proyek ini dirilis di bawah lisensi **MIT**.  
 Lihat file [LICENSE](LICENSE) untuk detail.
