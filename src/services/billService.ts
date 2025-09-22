@@ -1,7 +1,7 @@
 import { Validation } from '../common/type/validation';
 import { dbClient } from '../common/provider/database';
 import { BadRequest } from '../exceptions/error/badRequest';
-import { Bill, User } from '@prisma/client';
+import { Bill, Prisma, User } from '@prisma/client';
 import {
   BillResponse,
   CreateBillRequest,
@@ -14,13 +14,14 @@ export class BillService {
   static async create(
     user: User,
     req: CreateBillRequest,
+    tx: Prisma.TransactionClient = dbClient,
   ): Promise<BillResponse> {
     const validRequest: CreateBillRequest = Validation.validate(
       BillSchemaValidation.CREATE,
       req,
     );
 
-    const totalBillWithSameBill: number = await dbClient.bill.count({
+    const exists = await tx.bill.count({
       where: {
         studentId: validRequest.studentId,
         bill: validRequest.bill,
@@ -28,12 +29,9 @@ export class BillService {
         description: validRequest.description,
       },
     });
+    if (exists) throw new BadRequest('duplicate bill');
 
-    if (totalBillWithSameBill !== 0) {
-      throw new BadRequest('duplicate bill');
-    }
-
-    const data = await dbClient.bill.create({
+    const data = await tx.bill.create({
       data: { ...validRequest, createdBy: user.id },
     });
 

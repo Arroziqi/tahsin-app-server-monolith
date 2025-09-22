@@ -566,16 +566,22 @@ model PaymentFee {
   @@map("payment_fee")
 }
 
+enum ClassScheduleStatus {
+  DRAFT
+  PUBLISHED
+}
+
 model ClassSchedule {
-  id         Int      @id @default(autoincrement())
-  name       String   @unique @map("name")
-  levelId    Int      @map("level_id")
-  scheduleId Int      @map("schedule_id")
-  startDate  DateTime @map("start_date")
-  endDate    DateTime @map("end_date")
-  teacherId  Int      @map("teacher_id")
-  capacity   Int?     @default(0)
-  isActive   Boolean  @default(true)
+  id         Int                 @id @default(autoincrement())
+  name       String              @unique @map("name")
+  levelId    Int                 @map("level_id")
+  scheduleId Int                 @map("schedule_id")
+  startDate  DateTime            @map("start_date")
+  endDate    DateTime            @map("end_date")
+  teacherId  Int                 @map("teacher_id")
+  capacity   Int?                @default(0)
+  isActive   Boolean             @default(true) @map("is_active")
+  status     ClassScheduleStatus @default(DRAFT)
 
   createdAt DateTime? @default(now()) @map("created_at")
   createdBy Int?      @map("created_by")
@@ -587,4 +593,6 @@ model ClassSchedule {
   Teacher    Teacher?     @relation(fields: [teacherId], references: [id])
   Student    Student[]
   Enrollment Enrollment[]
+
+  @@map("class_schedule")
 }

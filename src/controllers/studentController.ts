@@ -68,4 +68,25 @@ export class StudentController {
       next(e);
     }
   }
+
+  static async getByLevelAndPreferredSchedule(
+    req: UserRequest,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const levelId = req.query.levelId ? Number(req.query.levelId) : undefined;
+      const preferredScheduleId = req.query.preferredScheduleId
+        ? Number(req.query.preferredScheduleId)
+        : undefined;
+
+      const response = await StudentService.getByLevelAndPreferredSchedule({
+        levelId,
+        preferredScheduleId,
+      });
+      res.status(200).json({ data: response });
+    } catch (e) {
+      next(e);
+    }
+  }
 }

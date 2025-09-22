@@ -120,6 +120,16 @@ async function main() {
     }),
   ]);
 
+  // Student Status
+  // const studentStatus = await prisma.studentStatus.create({
+  //   data: {
+  //     status: 'Aktif',
+  //     createdAt: now,
+  //     updatedAt: now,
+  //     updatedBy: superAdmin.id,
+  //   },
+  // });
+
   // Batch
   const batch = await prisma.batch.create({
     data: {
@@ -141,6 +151,18 @@ async function main() {
     },
   });
 
+  // Class
+  const kelas = await prisma.class.create({
+    data: {
+      class: 'Tahsin A',
+      classPriceId: classPrice.id,
+      batchId: batch.id,
+      createdAt: now,
+      updatedAt: now,
+      updatedBy: superAdmin.id,
+    },
+  });
+
   // Academic Period
   const academicPeriod = await prisma.academicPeriod.create({
     data: {
@@ -152,6 +174,44 @@ async function main() {
       updatedBy: superAdmin.id,
     },
   });
+
+  // Enrollment
+  // const enrollment = await prisma.enrollment.create({
+  //   data: {
+  //     fullName: 'Student Fullname',
+  //     dateOfBirth: new Date(),
+  //     noTelp: '089898989',
+  //     email: 'asas@gmail.com',
+  //     lastEducation: Education.SMA,
+  //     program: Program.DASAR,
+  //     classType: ClassType.ONLINE,
+  //     timeOfStudy: TimeOfStudy.MORNING,
+  //     motivation: 'belajar',
+  //     voiceRecording: 'voice',
+  //     academicPeriodId: academicPeriod.id, // pakai id hasil create
+  //     userId: studentUser.id,
+  //     classId: kelas.id,
+  //     createdAt: now,
+  //     updatedAt: now,
+  //     updatedBy: superAdmin.id,
+  //   },
+  // });
+
+  // Student
+  // const student = await prisma.student.create({
+  //   data: {
+  //     fullName: 'Ahmad Fauzi',
+  //     motivation: 'Ingin memperbaiki bacaan Al-Quran',
+  //     userId: studentUser.id,
+  //     levelId: levelDasar.id,
+  //     classId: kelas.id,
+  //     enrollmentId: enrollment.id,
+  //     studentStatus: StudentStatusEnum.ACTIVE,
+  //     createdAt: now,
+  //     updatedAt: now,
+  //     updatedBy: superAdmin.id,
+  //   },
+  // });
 
   // Day & Time
   const day = await prisma.day.create({
@@ -186,6 +246,77 @@ async function main() {
     },
   });
 
+  // Module
+  const module = await prisma.module.create({
+    data: {
+      classId: kelas.id,
+      module: 'Tajwid Dasar',
+      createdAt: now,
+      updatedAt: now,
+      updatedBy: superAdmin.id,
+    },
+  });
+
+  // Component
+  await prisma.component.create({
+    data: {
+      moduleId: module.id,
+      component: 'Mad Thobi’i',
+      createdAt: now,
+      updatedAt: now,
+      updatedBy: superAdmin.id,
+    },
+  });
+
+  // Task
+  const task = await prisma.task.create({
+    data: {
+      moduleId: module.id,
+      teacherId: teacher.id,
+      task: 'Latihan panjang pendek',
+      createdAt: now,
+      updatedAt: now,
+      updatedBy: superAdmin.id,
+    },
+  });
+
+  // Score
+  // await prisma.score.create({
+  //   data: {
+  //     value: 100,
+  //     studentId: student.id,
+  //     taskId: task.id,
+  //     createdAt: now,
+  //     updatedAt: now,
+  //     updatedBy: superAdmin.id,
+  //   },
+  // });
+
+  // Attendance;
+  // await prisma.attendance.create({
+  //   data: {
+  //     attendance: AttendanceStatus.ABSENT,
+  //     studentId: student.id,
+  //     scheduleId: schedule.id,
+  //     createdAt: now,
+  //     updatedAt: now,
+  //     updatedBy: superAdmin.id,
+  //   },
+  // });
+
+  // Bill
+  // const bill = await prisma.bill.create({
+  //   data: {
+  //     studentId: student.id,
+  //     bill: 300000,
+  //     remainBill: 50000,
+  //     description: 'Biaya Bulan Mei',
+  //     createdAt: now,
+  //     updatedAt: now,
+  //     updatedBy: superAdmin.id,
+  //   },
+  // });
+
   // Bank Account
   const bankAccount = await prisma.bankAccount.create({
     data: {
@@ -216,6 +347,20 @@ async function main() {
       updatedBy: superAdmin.id,
     },
   });
+
+  // Transaction
+  // await prisma.transaction.create({
+  //   data: {
+  //     bankAccountId: bankAccount.id,
+  //     billId: bill.id,
+  //     transactionType: FeeType.DOWN_PAYMENT,
+  //     transactionStatus: TransactionStatusEnum.PENDING,
+  //     amount: 300000,
+  //     createdAt: now,
+  //     updatedAt: now,
+  //     updatedBy: superAdmin.id,
+  //   },
+  // });
 
   console.log('✅ Seeder selesai (TS) dengan semua entitas.');
 }

@@ -120,6 +120,13 @@ export class ClassScheduleService {
         throw new BadRequest('data does not exist');
       }
 
+      // 🚫 Tidak boleh update kalau kelas sudah mulai
+      if (existing.startDate <= new Date()) {
+        throw new BadRequest(
+          'Tidak bisa mengubah class schedule yang sudah dimulai',
+        );
+      }
+
       const startDate = validRequest.startDate ?? existing.startDate;
       const endDate = validRequest.endDate ?? existing.endDate;
       if (startDate > endDate || startDate === endDate) {
@@ -225,7 +232,7 @@ export class ClassScheduleService {
     const data = await dbClient.classSchedule.findMany({
       include: {
         Level: true,
-        Schedule: true,
+        Schedule: { include: { Day: true, Time: true } },
         Teacher: true,
       },
     });
@@ -248,15 +255,25 @@ export class ClassScheduleService {
    * - Hapus dari database
    */
   static async delete(user: User, id: number): Promise<boolean> {
-    const existing = await dbClient.classSchedule.findFirst({
-      where: { id },
+    return dbClient.$transaction(async (tx) => {
+      const existing = await tx.classSchedule.findFirst({ where: { id } });
+      if (!existing) throw new BadRequest('Class schedule not found');
+
+      // 🚫 Tidak boleh hapus kalau jadwal sudah mulai
+      if (existing.startDate <= new Date()) {
+        throw new BadRequest(
+          'Tidak bisa menghapus class schedule yang sudah dimulai',
+        );
+      }
+
+      // Kosongkan classScheduleId di student yg terkait
+      await tx.student.updateMany({
+        where: { classScheduleId: id },
+        data: { classScheduleId: null },
+      });
+
+      await tx.classSchedule.delete({ where: { id } });
+      return true;
     });
-
-    if (!existing) {
-      throw new BadRequest('Class schedule not found');
-    }
-
-    await dbClient.classSchedule.delete({ where: { id } });
-    return true;
   }
 }

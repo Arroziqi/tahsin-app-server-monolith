@@ -1,7 +1,7 @@
 import { Validation } from '../common/type/validation';
 import { dbClient } from '../common/provider/database';
 import { BadRequest } from '../exceptions/error/badRequest';
-import { Day, Schedule, Time, User } from '@prisma/client';
+import { ClassType, Day, Schedule, Time, User } from '@prisma/client';
 import {
   CreateScheduleRequest,
   ScheduleResponse,
@@ -136,5 +136,43 @@ export class ScheduleService {
     await dbClient.schedule.delete({
       where: { id },
     });
+  }
+
+  /**
+   * Retrieve all schedules that are assigned to at least one student in preferredScheduleId
+   * @returns ScheduleResponse[]
+   */
+  static async getAssignedInPreferredSchedule(): Promise<ScheduleResponse[]> {
+    const schedules: ScheduleWithRelation[] = await dbClient.schedule.findMany({
+      where: {
+        Student: {
+          some: {
+            preferredScheduleId: {
+              not: null,
+            },
+          },
+        },
+      },
+      include: this.scheduleInclude,
+      distinct: ['id'],
+    });
+
+    return schedules.map(toScheduleResponse);
+  }
+
+  /**
+   * GET schedules by classType
+   * @param classType ClassType
+   * @returns ScheduleResponse[]
+   */
+  static async getByClassType(
+    classType: ClassType,
+  ): Promise<ScheduleResponse[]> {
+    const schedules: ScheduleWithRelation[] = await dbClient.schedule.findMany({
+      where: { classType },
+      include: this.scheduleInclude,
+    });
+
+    return schedules.map(toScheduleResponse);
   }
 }

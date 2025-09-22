@@ -7,3 +7,7 @@ levelRouter.patch('/api/level/update', LevelController.update);
 levelRouter.get('/api/level/get/:id', LevelController.get);
 levelRouter.get('/api/level/getAll', LevelController.getAll);
 levelRouter.delete('/api/level/delete/:id', LevelController.delete);
+levelRouter.get(
+  '/api/level/getAssignedLevels',
+  LevelController.getAssignedLevels,
+);

@@ -7,3 +7,11 @@ scheduleRouter.patch('/api/schedule/update', ScheduleController.update);
 scheduleRouter.get('/api/schedule/get/:id', ScheduleController.get);
 scheduleRouter.get('/api/schedule/getAll', ScheduleController.getAll);
 scheduleRouter.delete('/api/schedule/delete/:id', ScheduleController.delete);
+scheduleRouter.get(
+  '/api/schedule/getAssignedInPreferredSchedule',
+  ScheduleController.getAssignedInPreferredSchedule,
+);
+scheduleRouter.get(
+  '/api/schedule/getByClassType/:classType',
+  ScheduleController.getByClassType,
+);

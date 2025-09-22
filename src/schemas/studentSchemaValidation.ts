@@ -19,6 +19,7 @@ export class StudentSchemaValidation {
     levelId: z.number().optional(),
     classId: z.number().optional(),
     enrollmentId: z.number(),
+    preferredScheduleId: z.number(),
     studentStatus: z.nativeEnum(StudentStatusEnum).optional(),
   });
   static readonly UPDATE: ZodType = z.object({
@@ -36,6 +37,7 @@ export class StudentSchemaValidation {
     levelId: z.number().optional(),
     classId: z.number().optional(),
     enrollmentId: z.number().optional(),
+    preferredScheduleId: z.number().optional(),
     studentStatus: z.nativeEnum(StudentStatusEnum).optional(),
     classScheduleId: z.number().optional(),
   });

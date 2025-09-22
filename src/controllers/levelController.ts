@@ -88,4 +88,17 @@ export class LevelController {
       next(e);
     }
   }
+
+  static async getAssignedLevels(
+    req: UserRequest,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const response: LevelResponse[] = await LevelService.getAssignedLevels();
+      res.status(200).json({ data: response });
+    } catch (e) {
+      next(e);
+    }
+  }
 }

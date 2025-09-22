@@ -6,6 +6,7 @@ import {
   UpdateScheduleRequest,
 } from '../models/scheduleModel';
 import { UserRequest } from '../type/userRequest';
+import { ClassType } from '@prisma/client';
 
 export class ScheduleController {
   static async create(
@@ -80,6 +81,40 @@ export class ScheduleController {
       res.status(200).json({ message: 'Schedule deleted successfully' });
     } catch (e) {
       next(e);
+    }
+  }
+
+  static async getAssignedInPreferredSchedule(
+    req: UserRequest,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const response: ScheduleResponse[] =
+        await ScheduleService.getAssignedInPreferredSchedule();
+      res.status(200).json({ data: response });
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  static async getByClassType(req: UserRequest, res: Response): Promise<void> {
+    try {
+      const { classType } = req.params;
+
+      if (!Object.values(ClassType).includes(classType as ClassType)) {
+        res.status(400).json({ message: 'Invalid classType parameter' });
+        return;
+      }
+
+      const schedules = await ScheduleService.getByClassType(
+        classType as ClassType,
+      );
+
+      res.status(200).json({ data: schedules });
+    } catch (error) {
+      console.error('Error fetching schedules by classType:', error);
+      res.status(500).json({ message: (error as Error).message });
     }
   }
 }

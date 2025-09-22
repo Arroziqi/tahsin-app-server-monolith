@@ -61,19 +61,27 @@ export class EnrollmentService {
       let student: StudentResponse;
 
       if (validRequest.studentId) {
-        student = await StudentService.update(user, {
-          ...req,
-          id: validRequest.studentId,
-          enrollmentId: enrollment.id,
-          preferredScheduleId: enrollment.timeOfStudyId,
-        });
+        student = await StudentService.update(
+          user,
+          {
+            ...req,
+            id: validRequest.studentId,
+            enrollmentId: enrollment.id,
+            preferredScheduleId: enrollment.timeOfStudyId,
+          },
+          tx,
+        );
       } else {
-        student = await StudentService.create(user, {
-          ...req,
-          userId,
-          enrollmentId: enrollment.id,
-          preferredScheduleId: enrollment.timeOfStudyId,
-        });
+        student = await StudentService.create(
+          user,
+          {
+            ...req,
+            userId,
+            enrollmentId: enrollment.id,
+            preferredScheduleId: enrollment.timeOfStudyId,
+          },
+          tx,
+        );
       }
 
       const paymentFeeResponse: PaymentFeeResponse =
@@ -82,11 +90,15 @@ export class EnrollmentService {
           FeeType.DOWN_PAYMENT,
         );
 
-      await BillService.create(user, {
-        bill: paymentFeeResponse.amount,
-        remainBill: paymentFeeResponse.amount,
-        studentId: student.id,
-      });
+      await BillService.create(
+        user,
+        {
+          bill: paymentFeeResponse.amount,
+          remainBill: paymentFeeResponse.amount,
+          studentId: student.id,
+        },
+        tx,
+      );
 
       return toEnrollmentResponse(enrollment);
     });

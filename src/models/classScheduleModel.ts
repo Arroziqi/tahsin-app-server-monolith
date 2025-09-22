@@ -1,7 +1,13 @@
 import { LevelResponse } from './levelModel';
 import { ScheduleResponse } from './scheduleModel';
 import { TeacherResponse } from './teacherModel';
-import { ClassSchedule, Level, Schedule, Teacher } from '@prisma/client';
+import {
+  ClassSchedule,
+  ClassScheduleStatus,
+  Level,
+  Schedule,
+  Teacher,
+} from '@prisma/client';
 
 export type ClassScheduleResponse = {
   id: number;
@@ -13,6 +19,7 @@ export type ClassScheduleResponse = {
   teacherId: number;
   capacity?: number | null;
   isActive: boolean;
+  status?: ClassScheduleStatus;
   createdAt?: Date | null;
 
   Level?: LevelResponse | null;
@@ -40,6 +47,7 @@ export type UpdateClassScheduleRequest = {
   teacherId?: number;
   capacity?: number;
   isActive?: boolean;
+  status?: ClassScheduleStatus;
 };
 
 export function toClassScheduleResponse(
@@ -59,6 +67,7 @@ export function toClassScheduleResponse(
     teacherId: schedule.teacherId,
     capacity: schedule.capacity,
     isActive: schedule.isActive,
+    status: schedule.status,
     createdAt: schedule.createdAt,
 
     Level: schedule.Level,

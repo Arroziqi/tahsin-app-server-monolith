@@ -108,4 +108,30 @@ export class LevelService {
 
     return 'Level deleted successfully';
   }
+
+  /**
+   * Retrieve all levels that are assigned to at least one student
+   */
+  static async getAssignedLevels(): Promise<LevelResponse[]> {
+    const levels: Level[] = await dbClient.level.findMany({
+      where: {
+        id: {
+          in: (
+            await dbClient.student.findMany({
+              where: {
+                levelId: { not: null },
+              },
+              distinct: ['levelId'],
+              select: { levelId: true },
+            })
+          )
+            .map((s) => s.levelId!)
+            .filter((id) => id !== null),
+        },
+      },
+      orderBy: { level: 'asc' },
+    });
+
+    return levels.map((_: Level) => toLevelResponse(_));
+  }
 }

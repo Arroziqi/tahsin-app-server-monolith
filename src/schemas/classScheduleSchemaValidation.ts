@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ClassScheduleStatus } from '@prisma/client';
 
 const stringToDate = (val: unknown): Date => {
   if (val instanceof Date) return val;
@@ -48,6 +49,7 @@ export const ClassScheduleSchemaValidation = {
         .positive('Kapasitas harus lebih dari 0')
         .optional(),
       isActive: z.boolean().optional(),
+      status: z.nativeEnum(ClassScheduleStatus).optional(),
     })
     .refine(
       (data) => {
